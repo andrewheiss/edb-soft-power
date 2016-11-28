@@ -1,0 +1,19 @@
+.DS_Store
+
+# R stuff
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Output
+analysis/**_files/*
+analysis/**.html
+figures/*
+img/*
+
+# Data
+data/*.dta
+
+# Miscellaneous
+misc/*
