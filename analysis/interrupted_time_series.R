@@ -19,183 +19,23 @@
 #' ---
 
 #+ message=FALSE
-library(dplyr)
-library(tidyr)
-library(purrr)
+library(tidyverse)
 library(broom)
-library(readr)
-library(ggplot2)
-library(ggstance)
-library(gridExtra)
-library(haven)
-library(stargazer)
 library(lubridate)
 library(lazyeval)
-library(sandwich)
-library(lmtest)
-library(broom)
-library(pander)
+library(ggstance)
+library(gridExtra)
 library(countrycode)
+library(stargazer)
+library(pander)
 
 knitr::opts_chunk$set(cache=FALSE, fig.retina=2,
                       tidy.opts=list(width.cutoff=120),  # For code
                       options(width=120),  # For output
                       warning=FALSE)
 
-countries.with.edb.bureau <- read_csv(file.path(PROJHOME, "data/countries_with_edb_bureau.csv"))
-edb.its <- read_dta(file.path(PROJHOME, "data/MasterWBMarch16_15.dta")) %>%
-  filter(year > 1999) %>%
-  rename(p_edb_rank = p_ebd_rank) %>%
-  select(ccode, year, 
-         sb_proced, sb_days, sb_capital, sb_cost, con_proced, con_days, 
-         gdp, gdpcap, pop, gdpgrowth, polity = polity2, ibrd,
-         p_edb_rank) %>%
-  mutate_each(funs(ln = log1p(.)), 
-              starts_with("sb"), starts_with("con"), gdp, gdpcap, pop) %>%
-  mutate(year.centered.2005 = year - 2005,
-         year.centered.2006 = year - 2006,
-         ranked.2005 = year.centered.2005 >= 0,
-         ranked.2006 = year.centered.2006 >= 0) %>%
-  group_by(ccode) %>%
-  mutate(loan_ln = log1p(sum(ibrd, na.rm=TRUE))) %>%
-  mutate_each(funs(lag = lag(.))) %>%
-  ungroup()
-
-edb.its.constrained.countries <- edb.its %>%
-  mutate(in.report.in.2004 = year == 2004 & !is.na(sb_days),
-         in.report.in.2001 = year == 2001 & !is.na(sb_days)) %>%
-  group_by(ccode) %>%
-  summarise(in.2004 = sum(in.report.in.2004),
-            in.2001 = sum(in.report.in.2001))
-
-edb.its <- edb.its %>%
-  left_join(edb.its.constrained.countries, by="ccode") %>%
-  filter(in.2004 == 1)
-
-edb.its.2001 <- edb.its %>%
-  filter(in.2001 == 1)
-
-edb.its.committee <- edb.its %>%
-  filter(ccode %in% countries.with.edb.bureau$cowcode)
-
-edb.its.2001.committee <- edb.its %>%
-  filter(in.2001 == 1) %>%
-  filter(ccode %in% countries.with.edb.bureau$cowcode)
-
-edb.its.2001.nocommittee <- edb.its %>%
-  filter(in.2001 == 1) %>%
-  filter(!(ccode %in% countries.with.edb.bureau$cowcode))
-
-edb.its.cap.constrained <- filter(edb.its, year >= 2003)
-
-edb.its.2001.cap.constrained <- filter(edb.its.2001, year >= 2003)
-
-edb.its.committee.cap.constrained <- filter(edb.its.committee, year >= 2003)
-
-edb.its.2001.committee.cap.constrained <- filter(edb.its.2001.committee, year >= 2003)
-edb.its.2001.nocommittee.cap.constrained <- filter(edb.its.2001.nocommittee, year >= 2003)
-
-
-theme_edb <- function(base_size=9, base_family="Clear Sans Light") {
-  update_geom_defaults("label", list(family="Clear Sans Light"))
-  update_geom_defaults("text", list(family="Clear Sans Light"))
-  ret <- theme_bw(base_size, base_family) + 
-    theme(panel.background = element_rect(fill="#ffffff", colour=NA),
-          axis.title.y = element_text(margin = margin(r = 10)),
-          axis.title.x = element_text(margin = margin(t = 10)),
-          title=element_text(vjust=1.2, family="Clear Sans", face="bold"),
-          plot.subtitle=element_text(family="Clear Sans Light"),
-          plot.caption=element_text(family="Clear Sans Light",
-                                    size=rel(0.8), colour="grey70"),
-          panel.border = element_blank(), 
-          axis.line=element_line(colour="grey50", size=0.2),
-          #panel.grid=element_blank(), 
-          axis.ticks=element_blank(),
-          legend.position="bottom", 
-          legend.title=element_text(size=rel(0.8)),
-          axis.title=element_text(size=rel(0.8), family="Clear Sans", face="bold"),
-          strip.text=element_text(size=rel(1), family="Clear Sans", face="bold"),
-          strip.background=element_rect(fill="#ffffff", colour=NA),
-          panel.margin.y=unit(1.5, "lines"),
-          legend.key=element_blank(),
-          legend.margin=unit(0.2, "lines"))
-  
-  ret
-}
-
-plot.its <- function(model, var.name, var.title, y.title, plot.year = 2005) {
-  # summary_dots <- list(
-  #   n = ~ n(),
-  #   variable = interp(~ mean(val, na.rm = T), val=as.name(var.name)),
-  #   stdev = interp(~ sd(val, na.rm = T), val = as.name(var.name))
-  # )
-  
-  if (plot.year == 2005) {
-    plot.data <- edb.its %>%
-      group_by(year.centered.2005) %>%
-      summarise_(variable = interp(~mean(var, na.rm=TRUE), var=as.name(var.name)))
-
-    newdata <- data_frame(year.centered.2005 = seq(min(edb.its$year.centered.2005),
-                                              max(edb.its$year.centered.2005), by=1),
-                          ranked.2005 = year.centered.2005 >= 0,
-                          gdpcap_ln_lag = mean(edb.its$gdpcap_ln_lag, na.rm=TRUE),
-                          gdpgrowth_lag = mean(edb.its$gdpgrowth_lag, na.rm=TRUE),
-                          pop_ln_lag = mean(edb.its$pop_ln_lag, na.rm=TRUE))
-
-    plot.predict <- augment(model, newdata=newdata) %>% 
-      rename(variable = .fitted,
-             year.centered = year.centered.2005,
-             ranked = ranked.2005)
-  } else {
-    plot.data <- edb.its %>%
-      group_by(year.centered.2006) %>%
-      summarise_(variable = interp(~mean(var, na.rm=TRUE), var=as.name(var.name)))
-    
-    newdata <- data_frame(year.centered.2006 = seq(min(edb.its$year.centered.2006),
-                                              max(edb.its$year.centered.2006), by=1),
-                          ranked.2006 = year.centered.2006 >= 0,
-                          gdpcap_ln_lag = mean(edb.its$gdpcap_ln_lag, na.rm=TRUE),
-                          gdpgrowth_lag = mean(edb.its$gdpgrowth_lag, na.rm=TRUE),
-                          pop_ln_lag = mean(edb.its$pop_ln_lag, na.rm=TRUE))
-
-    plot.predict <- augment(model, newdata=newdata) %>% 
-      rename(variable = .fitted,
-             year.centered = year.centered.2006,
-             ranked = ranked.2006)
-  }
-
-  ggplot(plot.predict, aes(x=year.centered, y=variable)) +
-    geom_line() +
-    geom_line(data=plot.predict, aes(colour=ranked), size=0.75) +
-    geom_vline(xintercept=0) +
-    scale_colour_manual(values=c("#0073D9", "#CC3340"),
-                        labels=c("Not ranked    ", "Ranked"),
-                        name=NULL) +
-    labs(title=var.title, y=y.title, x=paste("Years since", plot.year)) +
-    theme_edb()
-}
-
-# Calculate clustered robust standard errors
-robust.clusterify <- function(model, dat, cluster) {
-  attach(dat, warn.conflicts = F)
-  not <- attr(model$model,"na.action")
-  
-  if( ! is.null(not)) {  # only drop the NA values if there are any left
-    cluster <- cluster[-not]
-    dat <- dat[-not,]
-  }
-  
-  with(dat, {
-    M <- length(unique(cluster))
-    N <- length(cluster)
-    K <- model$rank
-    dfc <- (M/(M-1))*((N-1)/(N-K))
-    uj <- apply(estfun(model),2, function(x) tapply(x, cluster, sum));
-    vcovCL <- dfc*sandwich(model, meat=crossprod(uj)/N)
-    coefs <- coeftest(model, vcovCL, type="HC1")  # HC1 or HC0 are close to Stata
-    return(list(clcov=vcovCL, coefs=coefs))
-  })
-}
+source(file.path(PROJHOME, "lib", "functions.R"))
+source(file.path(PROJHOME, "data", "clean_data.R"))
 
 #' ## Starting a business variables over time
 #' 
