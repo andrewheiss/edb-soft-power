@@ -29,13 +29,14 @@ library(countrycode)
 library(stargazer)
 library(pander)
 
-knitr::opts_chunk$set(cache=FALSE, fig.retina=2,
+knitr::opts_chunk$set(cache=TRUE, fig.retina=2,
                       tidy.opts=list(width.cutoff=120),  # For code
                       options(width=120),  # For output
                       warning=FALSE)
 
 source(file.path(PROJHOME, "lib", "functions.R"))
 source(file.path(PROJHOME, "data", "clean_data.R"))
+
 
 #' ## Starting a business variables over time
 #' 

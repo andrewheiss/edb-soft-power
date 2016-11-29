@@ -105,3 +105,18 @@ robust.clusterify <- function(model, dat, cluster) {
     return(list(clcov=vcovCL, coefs=coefs))
   })
 }
+
+summary.corr <- function(x, y=NULL) {
+  out <- data_frame(avg = mean(x, na.rm=TRUE), 
+                    stdev = sd(x, na.rm=TRUE), 
+                    std.error = stdev / sqrt(length(x)), 
+                    lower = avg + (qnorm(0.025) * std.error), 
+                    upper = avg + (qnorm(0.975) * std.error))
+  
+  if(length(y) > 0) {
+    out$correlation <- cor(x, y, use="complete.obs")
+  }
+  
+  out
+}
+

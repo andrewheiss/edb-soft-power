@@ -8,6 +8,7 @@
 
 # Output
 analysis/**_files/*
+analysis/**_cache/*
 analysis/**.html
 figures/*
 img/*

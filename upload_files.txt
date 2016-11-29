@@ -11,3 +11,5 @@ analysis/interrupted_time_series_2011.html
 analysis/interrupted_time_series_2011_files/
 analysis/percent_change_floor.html
 analysis/percent_change_floor_files/
+analysis/analysis.html
+analysis/analysis_files/
