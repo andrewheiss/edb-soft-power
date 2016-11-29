@@ -31,6 +31,9 @@ theme_edb <- function(base_size=9, base_family="Clear Sans Light") {
   ret
 }
 
+# Blank plot for spacing things in arrangeGrob()
+blank <- grid::rectGrob(gp=grid::gpar(col="white"))
+
 # Plot interrupted time series
 plot.its <- function(model, var.name, var.title, y.title, plot.year = 2005) {
   # summary_dots <- list(
