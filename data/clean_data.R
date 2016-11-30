@@ -23,7 +23,7 @@ edb.clean <- read_dta(file.path(PROJHOME, "data/MasterWBMarch16_15.dta")) %>%
          p_edb_rank) %>%
   mutate(has.bureau = ccode %in% countries.with.edb.bureau$cowcode,
          has.bureau = factor(has.bureau, 
-                             labels=c("No EDB reform committee    ", 
+                             labels=c("No EDB reform committee", 
                                       "Special EDB reform committee"))) %>%
   mutate_each(funs(ln = log1p(.)), 
               starts_with("sb"), starts_with("con"), gdp, gdpcap, pop, 
