@@ -19,8 +19,5 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Analysis
 
 - [Interrupted time series analysis (2005 and 2006)](analysis/interrupted_time_series.html)
-- [Interrupted time series analysis (2003 and 2004)](analysis/interrupted_time_series_2003.html)
-- [Interrupted time series analysis (2010 and 2011)](analysis/interrupted_time_series_2011.html)
 - [Percent change with floor](analysis/percent_change_floor.html)
-- [Different cutpoints](analysis/different_cutpoints.html)
 - [General analysis](analysis/analysis.html)
