@@ -264,53 +264,53 @@ grid.arrange(plot.without.committees, plot.with.committees, ncol=2)
 model.proced.orig <- lm(sb_proced ~ sb_proced_lag + ranked.2005_lag + gdpcap_ln_lag + 
                           gdpgrowth_lag + polity_lag + pop_ln_lag, 
                         data=edb.its)
-model.proced.orig.se <- robust.clusterify(model.proced.orig, edb.its, edb.its$ccode)
+model.proced.orig.se <- robust.clusterify(model.proced.orig, edb.its, "ccode")
 
 model.days.orig <- lm(sb_days ~ sb_days_lag + ranked.2005_lag + gdpcap_ln_lag + 
                           gdpgrowth_lag + polity_lag + pop_ln_lag, 
                         data=edb.its)
-model.days.orig.se <- robust.clusterify(model.days.orig, edb.its, edb.its$ccode)
+model.days.orig.se <- robust.clusterify(model.days.orig, edb.its, "ccode")
 
 model.days_ln.orig <- lm(sb_days_ln ~ sb_days_ln_lag + ranked.2005_lag + gdpcap_ln_lag + 
                           gdpgrowth_lag + polity_lag + pop_ln_lag, 
                         data=edb.its)
-model.days_ln.orig.se <- robust.clusterify(model.days_ln.orig, edb.its, edb.its$ccode)
+model.days_ln.orig.se <- robust.clusterify(model.days_ln.orig, edb.its, "ccode")
 
 model.cost_ln.orig <- lm(sb_cost_ln ~ sb_cost_ln_lag + ranked.2005_lag + gdpcap_ln_lag + 
                           gdpgrowth_lag + polity_lag + pop_ln_lag, 
                         data=edb.its)
-model.cost_ln.orig.se <- robust.clusterify(model.cost_ln.orig, edb.its, edb.its$ccode)
+model.cost_ln.orig.se <- robust.clusterify(model.cost_ln.orig, edb.its, "ccode")
 
 model.capital_ln.orig <- lm(sb_capital_ln ~ sb_capital_ln_lag + ranked.2005_lag + gdpcap_ln_lag + 
                           gdpgrowth_lag + polity_lag + pop_ln_lag, 
                         data=edb.its)
-model.capital_ln.orig.se <- robust.clusterify(model.capital_ln.orig, edb.its, edb.its$ccode)
+model.capital_ln.orig.se <- robust.clusterify(model.capital_ln.orig, edb.its, "ccode")
 
 
 model.proced.orig.nolag <- lm(sb_proced ~ ranked.2005_lag + gdpcap_ln_lag + 
                           gdpgrowth_lag + polity_lag + pop_ln_lag, 
                         data=edb.its)
-model.proced.orig.nolag.se <- robust.clusterify(model.proced.orig.nolag, edb.its, edb.its$ccode)
+model.proced.orig.nolag.se <- robust.clusterify(model.proced.orig.nolag, edb.its, "ccode")
 
 model.days.orig.nolag <- lm(sb_days ~ ranked.2005_lag + gdpcap_ln_lag + 
                         gdpgrowth_lag + polity_lag + pop_ln_lag, 
                       data=edb.its)
-model.days.orig.nolag.se <- robust.clusterify(model.days.orig.nolag, edb.its, edb.its$ccode)
+model.days.orig.nolag.se <- robust.clusterify(model.days.orig.nolag, edb.its, "ccode")
 
 model.days_ln.orig.nolag <- lm(sb_days_ln ~ ranked.2005_lag + gdpcap_ln_lag + 
                            gdpgrowth_lag + polity_lag + pop_ln_lag, 
                          data=edb.its)
-model.days_ln.orig.nolag.se <- robust.clusterify(model.days_ln.orig.nolag, edb.its, edb.its$ccode)
+model.days_ln.orig.nolag.se <- robust.clusterify(model.days_ln.orig.nolag, edb.its, "ccode")
 
 model.cost_ln.orig.nolag <- lm(sb_cost_ln ~ ranked.2005_lag + gdpcap_ln_lag + 
                            gdpgrowth_lag + polity_lag + pop_ln_lag, 
                          data=edb.its)
-model.cost_ln.orig.nolag.se <- robust.clusterify(model.cost_ln.orig.nolag, edb.its, edb.its$ccode)
+model.cost_ln.orig.nolag.se <- robust.clusterify(model.cost_ln.orig.nolag, edb.its, "ccode")
 
 model.capital_ln.orig.nolag <- lm(sb_capital_ln ~ ranked.2005_lag + gdpcap_ln_lag + 
                               gdpgrowth_lag + polity_lag + pop_ln_lag, 
                             data=edb.its)
-model.capital_ln.orig.nolag.se <- robust.clusterify(model.capital_ln.orig.nolag, edb.its, edb.its$ccode)
+model.capital_ln.orig.nolag.se <- robust.clusterify(model.capital_ln.orig.nolag, edb.its, "ccode")
 
 #+ results="asis"
 stargazer(model.proced.orig, model.proced.orig.nolag,
@@ -343,43 +343,43 @@ stargazer(model.proced.orig, model.proced.orig.nolag,
 model.proced.2005 <- lm(sb_proced ~ 
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                    data=edb.its)
-model.proced.2005.se <- robust.clusterify(model.proced.2005, edb.its, edb.its$ccode)
+model.proced.2005.se <- robust.clusterify(model.proced.2005, edb.its, "ccode")
 
 model.days_ln.2005 <- lm(sb_days_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its)
-model.days_ln.2005.se <- robust.clusterify(model.days_ln.2005, edb.its, edb.its$ccode)
+model.days_ln.2005.se <- robust.clusterify(model.days_ln.2005, edb.its, "ccode")
 
 model.cost_ln.2005 <- lm(sb_cost_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its)
-model.cost_ln.2005.se <- robust.clusterify(model.cost_ln.2005, edb.its, edb.its$ccode)
+model.cost_ln.2005.se <- robust.clusterify(model.cost_ln.2005, edb.its, "ccode")
 
 model.capital_ln.2005 <- lm(sb_capital_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.cap.constrained)
-model.capital_ln.2005.se <- robust.clusterify(model.capital_ln.2005, edb.its.cap.constrained, edb.its.cap.constrained$ccode)
+model.capital_ln.2005.se <- robust.clusterify(model.capital_ln.2005, edb.its.cap.constrained, "ccode")
 
 
 model.proced.2006 <- lm(sb_proced ~ 
                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                    data=edb.its)
-model.proced.2006.se <- robust.clusterify(model.proced.2006, edb.its, edb.its$ccode)
+model.proced.2006.se <- robust.clusterify(model.proced.2006, edb.its, "ccode")
 
 model.days_ln.2006 <- lm(sb_days_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its)
-model.days_ln.2006.se <- robust.clusterify(model.days_ln.2006, edb.its, edb.its$ccode)
+model.days_ln.2006.se <- robust.clusterify(model.days_ln.2006, edb.its, "ccode")
 
 model.cost_ln.2006 <- lm(sb_cost_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its)
-model.cost_ln.2006.se <- robust.clusterify(model.cost_ln.2006, edb.its, edb.its$ccode)
+model.cost_ln.2006.se <- robust.clusterify(model.cost_ln.2006, edb.its, "ccode")
 
 model.capital_ln.2006 <- lm(sb_capital_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.cap.constrained)
-model.capital_ln.2006.se <- robust.clusterify(model.capital_ln.2006, edb.its.cap.constrained, edb.its.cap.constrained$ccode)
+model.capital_ln.2006.se <- robust.clusterify(model.capital_ln.2006, edb.its.cap.constrained, "ccode")
 
 
 #+ results='asis'
@@ -402,43 +402,43 @@ stargazer(model.proced.2005, model.days_ln.2005,
 model.proced.2005.2001 <- lm(sb_proced ~ 
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                    data=edb.its.2001)
-model.proced.2005.2001.se <- robust.clusterify(model.proced.2005.2001, edb.its.2001, edb.its.2001$ccode)
+model.proced.2005.2001.se <- robust.clusterify(model.proced.2005.2001, edb.its.2001, "ccode")
 
 model.days_ln.2005.2001 <- lm(sb_days_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001)
-model.days_ln.2005.2001.se <- robust.clusterify(model.days_ln.2005.2001, edb.its.2001, edb.its.2001$ccode)
+model.days_ln.2005.2001.se <- robust.clusterify(model.days_ln.2005.2001, edb.its.2001, "ccode")
 
 model.cost_ln.2005.2001 <- lm(sb_cost_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001)
-model.cost_ln.2005.2001.se <- robust.clusterify(model.cost_ln.2005.2001, edb.its.2001, edb.its.2001$ccode)
+model.cost_ln.2005.2001.se <- robust.clusterify(model.cost_ln.2005.2001, edb.its.2001, "ccode")
 
 model.capital_ln.2005.2001 <- lm(sb_capital_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001.cap.constrained)
-model.capital_ln.2005.2001.se <- robust.clusterify(model.capital_ln.2005.2001, edb.its.2001.cap.constrained, edb.its.2001.cap.constrained$ccode)
+model.capital_ln.2005.2001.se <- robust.clusterify(model.capital_ln.2005.2001, edb.its.2001.cap.constrained, "ccode")
 
 
 model.proced.2006.2001 <- lm(sb_proced ~ 
                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                    data=edb.its.2001)
-model.proced.2006.2001.se <- robust.clusterify(model.proced.2006.2001, edb.its.2001, edb.its.2001$ccode)
+model.proced.2006.2001.se <- robust.clusterify(model.proced.2006.2001, edb.its.2001, "ccode")
 
 model.days_ln.2006.2001 <- lm(sb_days_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.2001)
-model.days_ln.2006.2001.se <- robust.clusterify(model.days_ln.2006.2001, edb.its.2001, edb.its.2001$ccode)
+model.days_ln.2006.2001.se <- robust.clusterify(model.days_ln.2006.2001, edb.its.2001, "ccode")
 
 model.cost_ln.2006.2001 <- lm(sb_cost_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.2001)
-model.cost_ln.2006.2001.se <- robust.clusterify(model.cost_ln.2006.2001, edb.its.2001, edb.its.2001$ccode)
+model.cost_ln.2006.2001.se <- robust.clusterify(model.cost_ln.2006.2001, edb.its.2001, "ccode")
 
 model.capital_ln.2006.2001 <- lm(sb_capital_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.2001.cap.constrained)
-model.capital_ln.2006.2001.se <- robust.clusterify(model.capital_ln.2006.2001, edb.its.2001.cap.constrained, edb.its.2001.cap.constrained$ccode)
+model.capital_ln.2006.2001.se <- robust.clusterify(model.capital_ln.2006.2001, edb.its.2001.cap.constrained, "ccode")
 
 
 #+ results='asis'
@@ -461,43 +461,43 @@ stargazer(model.proced.2005.2001, model.days_ln.2005.2001,
 model.proced.2005.committee <- lm(sb_proced ~ 
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                    data=edb.its.committee)
-model.proced.2005.committee.se <- robust.clusterify(model.proced.2005.committee, edb.its.committee, edb.its.committee$ccode)
+model.proced.2005.committee.se <- robust.clusterify(model.proced.2005.committee, edb.its.committee, "ccode")
 
 model.days_ln.2005.committee <- lm(sb_days_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.committee)
-model.days_ln.2005.committee.se <- robust.clusterify(model.days_ln.2005.committee, edb.its.committee, edb.its.committee$ccode)
+model.days_ln.2005.committee.se <- robust.clusterify(model.days_ln.2005.committee, edb.its.committee, "ccode")
 
 model.cost_ln.2005.committee <- lm(sb_cost_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.committee)
-model.cost_ln.2005.committee.se <- robust.clusterify(model.cost_ln.2005.committee, edb.its.committee, edb.its.committee$ccode)
+model.cost_ln.2005.committee.se <- robust.clusterify(model.cost_ln.2005.committee, edb.its.committee, "ccode")
 
 model.capital_ln.2005.committee <- lm(sb_capital_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.committee.cap.constrained)
-model.capital_ln.2005.committee.se <- robust.clusterify(model.capital_ln.2005.committee, edb.its.committee.cap.constrained, edb.its.committee.cap.constrained$ccode)
+model.capital_ln.2005.committee.se <- robust.clusterify(model.capital_ln.2005.committee, edb.its.committee.cap.constrained, "ccode")
 
 
 model.proced.2006.committee <- lm(sb_proced ~ 
                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                    data=edb.its.committee)
-model.proced.2006.committee.se <- robust.clusterify(model.proced.2006.committee, edb.its.committee, edb.its.committee$ccode)
+model.proced.2006.committee.se <- robust.clusterify(model.proced.2006.committee, edb.its.committee, "ccode")
 
 model.days_ln.2006.committee <- lm(sb_days_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.committee)
-model.days_ln.2006.committee.se <- robust.clusterify(model.days_ln.2006.committee, edb.its.committee, edb.its.committee$ccode)
+model.days_ln.2006.committee.se <- robust.clusterify(model.days_ln.2006.committee, edb.its.committee, "ccode")
 
 model.cost_ln.2006.committee <- lm(sb_cost_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.committee)
-model.cost_ln.2006.committee.se <- robust.clusterify(model.cost_ln.2006.committee, edb.its.committee, edb.its.committee$ccode)
+model.cost_ln.2006.committee.se <- robust.clusterify(model.cost_ln.2006.committee, edb.its.committee, "ccode")
 
 model.capital_ln.2006.committee <- lm(sb_capital_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.committee.cap.constrained)
-model.capital_ln.2006.committee.se <- robust.clusterify(model.capital_ln.2006.committee, edb.its.committee.cap.constrained, edb.its.committee.cap.constrained$ccode)
+model.capital_ln.2006.committee.se <- robust.clusterify(model.capital_ln.2006.committee, edb.its.committee.cap.constrained, "ccode")
 
 
 #+ results='asis'
@@ -520,43 +520,43 @@ stargazer(model.proced.2005.committee, model.days_ln.2005.committee,
 model.proced.2005.2001.committee <- lm(sb_proced ~ 
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                    data=edb.its.2001.committee)
-model.proced.2005.2001.committee.se <- robust.clusterify(model.proced.2005.2001.committee, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.proced.2005.2001.committee.se <- robust.clusterify(model.proced.2005.2001.committee, edb.its.2001.committee, "ccode")
 
 model.days_ln.2005.2001.committee <- lm(sb_days_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001.committee)
-model.days_ln.2005.2001.committee.se <- robust.clusterify(model.days_ln.2005.2001.committee, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.days_ln.2005.2001.committee.se <- robust.clusterify(model.days_ln.2005.2001.committee, edb.its.2001.committee, "ccode")
 
 model.cost_ln.2005.2001.committee <- lm(sb_cost_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001.committee)
-model.cost_ln.2005.2001.committee.se <- robust.clusterify(model.cost_ln.2005.2001.committee, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.cost_ln.2005.2001.committee.se <- robust.clusterify(model.cost_ln.2005.2001.committee, edb.its.2001.committee, "ccode")
 
 model.capital_ln.2005.2001.committee <- lm(sb_capital_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001.committee.cap.constrained)
-model.capital_ln.2005.2001.committee.se <- robust.clusterify(model.capital_ln.2005.2001.committee, edb.its.2001.committee.cap.constrained, edb.its.2001.committee.cap.constrained$ccode)
+model.capital_ln.2005.2001.committee.se <- robust.clusterify(model.capital_ln.2005.2001.committee, edb.its.2001.committee.cap.constrained, "ccode")
 
 
 model.proced.2006.2001.committee <- lm(sb_proced ~ 
                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                    data=edb.its.2001.committee)
-model.proced.2006.2001.committee.se <- robust.clusterify(model.proced.2006.2001.committee, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.proced.2006.2001.committee.se <- robust.clusterify(model.proced.2006.2001.committee, edb.its.2001.committee, "ccode")
 
 model.days_ln.2006.2001.committee <- lm(sb_days_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.2001.committee)
-model.days_ln.2006.2001.committee.se <- robust.clusterify(model.days_ln.2006.2001.committee, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.days_ln.2006.2001.committee.se <- robust.clusterify(model.days_ln.2006.2001.committee, edb.its.2001.committee, "ccode")
 
 model.cost_ln.2006.2001.committee <- lm(sb_cost_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.2001.committee)
-model.cost_ln.2006.2001.committee.se <- robust.clusterify(model.cost_ln.2006.2001.committee, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.cost_ln.2006.2001.committee.se <- robust.clusterify(model.cost_ln.2006.2001.committee, edb.its.2001.committee, "ccode")
 
 model.capital_ln.2006.2001.committee <- lm(sb_capital_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006, 
                     data=edb.its.2001.committee.cap.constrained)
-model.capital_ln.2006.2001.committee.se <- robust.clusterify(model.capital_ln.2006.2001.committee, edb.its.2001.committee.cap.constrained, edb.its.2001.committee.cap.constrained$ccode)
+model.capital_ln.2006.2001.committee.se <- robust.clusterify(model.capital_ln.2006.2001.committee, edb.its.2001.committee.cap.constrained, "ccode")
 
 
 #+ results='asis'
@@ -579,22 +579,22 @@ stargazer(model.proced.2005.2001.committee, model.days_ln.2005.2001.committee,
 model.proced.2005_lag <- lm(sb_proced ~ sb_proced_lag +
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                    data=edb.its)
-model.proced.2005_lag.se <- robust.clusterify(model.proced.2005_lag, edb.its, edb.its$ccode)
+model.proced.2005_lag.se <- robust.clusterify(model.proced.2005_lag, edb.its, "ccode")
 
 model.days_ln.2005_lag <- lm(sb_days_ln ~ sb_days_ln_lag +
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its)
-model.days_ln.2005_lag.se <- robust.clusterify(model.days_ln.2005_lag, edb.its, edb.its$ccode)
+model.days_ln.2005_lag.se <- robust.clusterify(model.days_ln.2005_lag, edb.its, "ccode")
 
 model.cost_ln.2005_lag <- lm(sb_cost_ln ~ sb_cost_ln_lag +
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its)
-model.cost_ln.2005_lag.se <- robust.clusterify(model.cost_ln.2005_lag, edb.its, edb.its$ccode)
+model.cost_ln.2005_lag.se <- robust.clusterify(model.cost_ln.2005_lag, edb.its, "ccode")
 
 model.capital_ln.2005_lag <- lm(sb_capital_ln ~ sb_capital_ln_lag +
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.cap.constrained)
-model.capital_ln.2005_lag.se <- robust.clusterify(model.capital_ln.2005_lag, edb.its.cap.constrained, edb.its.cap.constrained$ccode)
+model.capital_ln.2005_lag.se <- robust.clusterify(model.capital_ln.2005_lag, edb.its.cap.constrained, "ccode")
 
 #' Simple ITS models included as models 1, 3, 5, and 7 for comparison with
 #' versions that control for lagged DV.
@@ -619,22 +619,22 @@ stargazer(model.proced.2005, model.proced.2005_lag,
 model.proced.2005.2001 <- lm(sb_proced ~ 
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                    data=edb.its.2001)
-model.proced.2005.2001.se <- robust.clusterify(model.proced.2005.2001, edb.its.2001, edb.its.2001$ccode)
+model.proced.2005.2001.se <- robust.clusterify(model.proced.2005.2001, edb.its.2001, "ccode")
 
 model.days_ln.2005.2001 <- lm(sb_days_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001)
-model.days_ln.2005.2001.se <- robust.clusterify(model.days_ln.2005.2001, edb.its.2001, edb.its.2001$ccode)
+model.days_ln.2005.2001.se <- robust.clusterify(model.days_ln.2005.2001, edb.its.2001, "ccode")
 
 model.cost_ln.2005.2001 <- lm(sb_cost_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001)
-model.cost_ln.2005.2001.se <- robust.clusterify(model.cost_ln.2005.2001, edb.its.2001, edb.its.2001$ccode)
+model.cost_ln.2005.2001.se <- robust.clusterify(model.cost_ln.2005.2001, edb.its.2001, "ccode")
 
 model.capital_ln.2005.2001 <- lm(sb_capital_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.2001.cap.constrained)
-model.capital_ln.2005.2001.se <- robust.clusterify(model.capital_ln.2005.2001, edb.its.2001.cap.constrained, edb.its.2001.cap.constrained$ccode)
+model.capital_ln.2005.2001.se <- robust.clusterify(model.capital_ln.2005.2001, edb.its.2001.cap.constrained, "ccode")
 
 model.capital_ln_controls.2005.2001 <- lm(sb_capital_ln ~ 
                                             year.centered.2005 + ranked.2005 + 
@@ -643,7 +643,7 @@ model.capital_ln_controls.2005.2001 <- lm(sb_capital_ln ~
                                             pop_ln_lag + polity_lag +
                                             as.factor(ccode), 
                                           data=edb.its.2001.cap.constrained)
-model.capital_ln_controls.2005.2001.se <- robust.clusterify(model.capital_ln_controls.2005.2001, edb.its.2001.cap.constrained, edb.its.2001.cap.constrained$ccode)
+model.capital_ln_controls.2005.2001.se <- robust.clusterify(model.capital_ln_controls.2005.2001, edb.its.2001.cap.constrained, "ccode")
 
 #' Models 2, 4, 6, and 8 are constrained to countries that appeared in the
 #' original 2001 EDB report.
@@ -670,22 +670,22 @@ stargazer(model.proced.2005, model.proced.2005.2001,
 model.proced.committee <- lm(sb_proced ~ 
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                    data=edb.its.committee)
-model.proced.committee.se <- robust.clusterify(model.proced.committee, edb.its.committee, edb.its.committee$ccode)
+model.proced.committee.se <- robust.clusterify(model.proced.committee, edb.its.committee, "ccode")
 
 model.days_ln.committee <- lm(sb_days_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.committee)
-model.days_ln.committee.se <- robust.clusterify(model.days_ln.committee, edb.its.committee, edb.its.committee$ccode)
+model.days_ln.committee.se <- robust.clusterify(model.days_ln.committee, edb.its.committee, "ccode")
 
 model.cost_ln.committee <- lm(sb_cost_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.committee)
-model.cost_ln.committee.se <- robust.clusterify(model.cost_ln.committee, edb.its.committee, edb.its.committee$ccode)
+model.cost_ln.committee.se <- robust.clusterify(model.cost_ln.committee, edb.its.committee, "ccode")
 
 model.capital_ln.committee <- lm(sb_capital_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005, 
                     data=edb.its.committee.cap.constrained)
-model.capital_ln.committee.se <- robust.clusterify(model.capital_ln.committee, edb.its.committee.cap.constrained, edb.its.committee.cap.constrained$ccode)
+model.capital_ln.committee.se <- robust.clusterify(model.capital_ln.committee, edb.its.committee.cap.constrained, "ccode")
 
 model.capital_ln_controls.committee <- lm(sb_capital_ln ~ 
                                             year.centered.2005 + ranked.2005 + 
@@ -694,7 +694,7 @@ model.capital_ln_controls.committee <- lm(sb_capital_ln ~
                                             pop_ln_lag + polity_lag +
                                             as.factor(ccode), 
                                           data=edb.its.committee.cap.constrained)
-model.capital_ln_controls.committee.se <- robust.clusterify(model.capital_ln_controls.committee, edb.its.committee.cap.constrained, edb.its.committee.cap.constrained$ccode)
+model.capital_ln_controls.committee.se <- robust.clusterify(model.capital_ln_controls.committee, edb.its.committee.cap.constrained, "ccode")
 
 #+ results='asis'
 stargazer(model.proced.committee,
@@ -719,50 +719,50 @@ model.proced_loan_fe.2005 <- lm(sb_proced ~
                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005 +
                      loan_ln + as.factor(ccode), 
                    data=edb.its)
-model.proced_loan_fe.2005.se <- robust.clusterify(model.proced_loan_fe.2005, edb.its, edb.its$ccode)
+model.proced_loan_fe.2005.se <- robust.clusterify(model.proced_loan_fe.2005, edb.its, "ccode")
 
 model.days_ln_loan_fe.2005 <- lm(sb_days_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005 +
                       loan_ln + as.factor(ccode), 
                     data=edb.its)
-model.days_ln_loan_fe.2005.se <- robust.clusterify(model.days_ln_loan_fe.2005, edb.its, edb.its$ccode)
+model.days_ln_loan_fe.2005.se <- robust.clusterify(model.days_ln_loan_fe.2005, edb.its, "ccode")
 
 model.cost_ln_loan_fe.2005 <- lm(sb_cost_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005 +
                       loan_ln + as.factor(ccode), 
                     data=edb.its)
-model.cost_ln_loan_fe.2005.se <- robust.clusterify(model.cost_ln_loan_fe.2005, edb.its, edb.its$ccode)
+model.cost_ln_loan_fe.2005.se <- robust.clusterify(model.cost_ln_loan_fe.2005, edb.its, "ccode")
 
 model.capital_ln_loan_fe.2005<- lm(sb_capital_ln ~ 
                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005 +
                       loan_ln + as.factor(ccode), 
                     data=edb.its.cap.constrained)
-model.capital_ln_loan_fe.2005.se <- robust.clusterify(model.capital_ln_loan_fe.2005, edb.its.cap.constrained, edb.its.cap.constrained$ccode)
+model.capital_ln_loan_fe.2005.se <- robust.clusterify(model.capital_ln_loan_fe.2005, edb.its.cap.constrained, "ccode")
 
 
 model.proced_loan_fe.2006 <- lm(sb_proced ~ 
                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006 +
                      loan_ln + as.factor(ccode), 
                    data=edb.its)
-model.proced_loan_fe.2006.se <- robust.clusterify(model.proced_loan_fe.2006, edb.its, edb.its$ccode)
+model.proced_loan_fe.2006.se <- robust.clusterify(model.proced_loan_fe.2006, edb.its, "ccode")
 
 model.days_ln_loan_fe.2006 <- lm(sb_days_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006 +
                       loan_ln + as.factor(ccode), 
                     data=edb.its)
-model.days_ln_loan_fe.2006.se <- robust.clusterify(model.days_ln_loan_fe.2006, edb.its, edb.its$ccode)
+model.days_ln_loan_fe.2006.se <- robust.clusterify(model.days_ln_loan_fe.2006, edb.its, "ccode")
 
 model.cost_ln_loan_fe.2006 <- lm(sb_cost_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006 +
                       loan_ln + as.factor(ccode), 
                     data=edb.its)
-model.cost_ln_loan_fe.2006.se <- robust.clusterify(model.cost_ln_loan_fe.2006, edb.its, edb.its$ccode)
+model.cost_ln_loan_fe.2006.se <- robust.clusterify(model.cost_ln_loan_fe.2006, edb.its, "ccode")
 
 model.capital_ln_loan_fe.2006 <- lm(sb_capital_ln ~ 
                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006 +
                       loan_ln + as.factor(ccode), 
                     data=edb.its.cap.constrained)
-model.capital_ln_loan_fe.2006.se <- robust.clusterify(model.capital_ln_loan_fe.2006, edb.its.cap.constrained, edb.its.cap.constrained$ccode)
+model.capital_ln_loan_fe.2006.se <- robust.clusterify(model.capital_ln_loan_fe.2006, edb.its.cap.constrained, "ccode")
 
 
 #+ results='asis'
@@ -787,28 +787,28 @@ model.proced_controls_fe.2005 <- lm(sb_proced ~
                                  gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                  as.factor(ccode), 
                                data=edb.its)
-model.proced_controls_fe.2005.se <- robust.clusterify(model.proced_controls_fe.2005, edb.its, edb.its$ccode)
+model.proced_controls_fe.2005.se <- robust.clusterify(model.proced_controls_fe.2005, edb.its, "ccode")
 
 model.days_ln_controls_fe.2005 <- lm(sb_days_ln ~ 
                                   year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005 +
                                   gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                   as.factor(ccode), 
                                 data=edb.its)
-model.days_ln_controls_fe.2005.se <- robust.clusterify(model.days_ln_controls_fe.2005, edb.its, edb.its$ccode)
+model.days_ln_controls_fe.2005.se <- robust.clusterify(model.days_ln_controls_fe.2005, edb.its, "ccode")
 
 model.cost_ln_controls_fe.2005 <- lm(sb_cost_ln ~ 
                                   year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005 +
                                   gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                   as.factor(ccode), 
                                 data=edb.its)
-model.cost_ln_controls_fe.2005.se <- robust.clusterify(model.cost_ln_controls_fe.2005, edb.its, edb.its$ccode)
+model.cost_ln_controls_fe.2005.se <- robust.clusterify(model.cost_ln_controls_fe.2005, edb.its, "ccode")
 
 model.capital_ln_controls_fe.2005 <- lm(sb_capital_ln ~ 
                                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005 +
                                      gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                      as.factor(ccode), 
                                    data=edb.its.cap.constrained)
-model.capital_ln_controls_fe.2005.se <- robust.clusterify(model.capital_ln_controls_fe.2005, edb.its.cap.constrained, edb.its.cap.constrained$ccode)
+model.capital_ln_controls_fe.2005.se <- robust.clusterify(model.capital_ln_controls_fe.2005, edb.its.cap.constrained, "ccode")
 
 
 model.proced_controls_fe.2006 <- lm(sb_proced ~ 
@@ -816,28 +816,28 @@ model.proced_controls_fe.2006 <- lm(sb_proced ~
                                  gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                  as.factor(ccode), 
                                data=edb.its)
-model.proced_controls_fe.2006.se <- robust.clusterify(model.proced_controls_fe.2006, edb.its, edb.its$ccode)
+model.proced_controls_fe.2006.se <- robust.clusterify(model.proced_controls_fe.2006, edb.its, "ccode")
 
 model.days_ln_controls_fe.2006 <- lm(sb_days_ln ~ 
                                   year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006 +
                                   gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                   as.factor(ccode), 
                                 data=edb.its)
-model.days_ln_controls_fe.2006.se <- robust.clusterify(model.days_ln_controls_fe.2006, edb.its, edb.its$ccode)
+model.days_ln_controls_fe.2006.se <- robust.clusterify(model.days_ln_controls_fe.2006, edb.its, "ccode")
 
 model.cost_ln_controls_fe.2006 <- lm(sb_cost_ln ~ 
                                   year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006 +
                                   gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                   as.factor(ccode), 
                                 data=edb.its)
-model.cost_ln_controls_fe.2006.se <- robust.clusterify(model.cost_ln_controls_fe.2006, edb.its, edb.its$ccode)
+model.cost_ln_controls_fe.2006.se <- robust.clusterify(model.cost_ln_controls_fe.2006, edb.its, "ccode")
 
 model.capital_ln_controls_fe.2006 <- lm(sb_capital_ln ~ 
                                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006 +
                                      gdpcap_ln_lag + gdpgrowth_lag + pop_ln_lag + polity_lag +
                                      as.factor(ccode), 
                                    data=edb.its.cap.constrained)
-model.capital_ln_controls_fe.2006.se <- robust.clusterify(model.capital_ln_controls_fe.2006, edb.its.cap.constrained, edb.its.cap.constrained$ccode)
+model.capital_ln_controls_fe.2006.se <- robust.clusterify(model.capital_ln_controls_fe.2006, edb.its.cap.constrained, "ccode")
 
 
 #+ results='asis'
@@ -865,36 +865,36 @@ stargazer(model.proced_controls_fe.2005, model.days_ln_controls_fe.2005,
 #' ### Models for all countries in 2001 report
 model.proced.lag.2005.all <- lm(sb_proced ~ sb_proced_lag + ranked.2005, 
                                 data=edb.its.2001)
-model.proced.lag.2005.all.se <- robust.clusterify(model.proced.lag.2005.all, edb.its.2001, edb.its.2001$ccode)
+model.proced.lag.2005.all.se <- robust.clusterify(model.proced.lag.2005.all, edb.its.2001, "ccode")
 
 model.days_ln.lag.2005.all <- lm(sb_days_ln ~ sb_days_ln_lag + ranked.2005, 
                                  data=edb.its.2001)
-model.days_ln.lag.2005.all.se <- robust.clusterify(model.days_ln.lag.2005.all, edb.its.2001, edb.its.2001$ccode)
+model.days_ln.lag.2005.all.se <- robust.clusterify(model.days_ln.lag.2005.all, edb.its.2001, "ccode")
 
 model.cost_ln.lag.2005.all <- lm(sb_cost_ln ~ sb_cost_ln_lag + ranked.2005, 
                                  data=edb.its.2001)
-model.cost_ln.lag.2005.all.se <- robust.clusterify(model.cost_ln.lag.2005.all, edb.its.2001, edb.its.2001$ccode)
+model.cost_ln.lag.2005.all.se <- robust.clusterify(model.cost_ln.lag.2005.all, edb.its.2001, "ccode")
 
 model.capital_ln.lag.2005.all <- lm(sb_capital_ln ~ sb_capital_ln_lag + ranked.2005, 
                                     data=edb.its.2001.cap.constrained)
-model.capital_ln.lag.2005.all.se <- robust.clusterify(model.capital_ln.lag.2005.all, edb.its.2001.cap.constrained, edb.its.2001.cap.constrained$ccode)
+model.capital_ln.lag.2005.all.se <- robust.clusterify(model.capital_ln.lag.2005.all, edb.its.2001.cap.constrained, "ccode")
 
 
 model.proced.lag.2006.all <- lm(sb_proced ~ sb_proced_lag + ranked.2006, 
                                 data=edb.its.2001)
-model.proced.lag.2006.all.se <- robust.clusterify(model.proced.lag.2006.all, edb.its.2001, edb.its.2001$ccode)
+model.proced.lag.2006.all.se <- robust.clusterify(model.proced.lag.2006.all, edb.its.2001, "ccode")
 
 model.days_ln.lag.2006.all <- lm(sb_days_ln ~ sb_days_ln_lag + ranked.2006, 
                                  data=edb.its.2001)
-model.days_ln.lag.2006.all.se <- robust.clusterify(model.days_ln.lag.2006.all, edb.its.2001, edb.its.2001$ccode)
+model.days_ln.lag.2006.all.se <- robust.clusterify(model.days_ln.lag.2006.all, edb.its.2001, "ccode")
 
 model.cost_ln.lag.2006.all <- lm(sb_cost_ln ~ sb_cost_ln_lag + ranked.2006, 
                                  data=edb.its.2001)
-model.cost_ln.lag.2006.all.se <- robust.clusterify(model.cost_ln.lag.2006.all, edb.its.2001, edb.its.2001$ccode)
+model.cost_ln.lag.2006.all.se <- robust.clusterify(model.cost_ln.lag.2006.all, edb.its.2001, "ccode")
 
 model.capital_ln.lag.2006.all <- lm(sb_capital_ln ~ sb_capital_ln_lag + ranked.2006, 
                                     data=edb.its.2001.cap.constrained)
-model.capital_ln.lag.2006.all.se <- robust.clusterify(model.capital_ln.lag.2006.all, edb.its.2001.cap.constrained, edb.its.2001.cap.constrained$ccode)
+model.capital_ln.lag.2006.all.se <- robust.clusterify(model.capital_ln.lag.2006.all, edb.its.2001.cap.constrained, "ccode")
 
 
 #
@@ -917,70 +917,70 @@ stargazer(model.proced.lag.2005.all, model.days_ln.lag.2005.all,
 #' ### Models for countries with/without reform committees
 model.proced.lag.2005.nocom <- lm(sb_proced ~ sb_proced_lag + ranked.2005, 
                         data=edb.its.2001.nocommittee)
-model.proced.lag.2005.nocom.se <- robust.clusterify(model.proced.lag.2005.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.proced.lag.2005.nocom.se <- robust.clusterify(model.proced.lag.2005.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.days_ln.lag.2005.nocom <- lm(sb_days_ln ~ sb_days_ln_lag + ranked.2005, 
                          data=edb.its.2001.nocommittee)
-model.days_ln.lag.2005.nocom.se <- robust.clusterify(model.days_ln.lag.2005.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.days_ln.lag.2005.nocom.se <- robust.clusterify(model.days_ln.lag.2005.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.cost_ln.lag.2005.nocom <- lm(sb_cost_ln ~ sb_cost_ln_lag + ranked.2005, 
                          data=edb.its.2001.nocommittee)
-model.cost_ln.lag.2005.nocom.se <- robust.clusterify(model.cost_ln.lag.2005.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.cost_ln.lag.2005.nocom.se <- robust.clusterify(model.cost_ln.lag.2005.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.capital_ln.lag.2005.nocom <- lm(sb_capital_ln ~ sb_capital_ln_lag + ranked.2005, 
                             data=edb.its.2001.nocommittee.cap.constrained)
-model.capital_ln.lag.2005.nocom.se <- robust.clusterify(model.capital_ln.lag.2005.nocom, edb.its.2001.nocommittee.cap.constrained, edb.its.2001.nocommittee.cap.constrained$ccode)
+model.capital_ln.lag.2005.nocom.se <- robust.clusterify(model.capital_ln.lag.2005.nocom, edb.its.2001.nocommittee.cap.constrained, "ccode")
 
 
 model.proced.lag.2006.nocom <- lm(sb_proced ~ sb_proced_lag + ranked.2006, 
                         data=edb.its.2001.nocommittee)
-model.proced.lag.2006.nocom.se <- robust.clusterify(model.proced.lag.2006.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.proced.lag.2006.nocom.se <- robust.clusterify(model.proced.lag.2006.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.days_ln.lag.2006.nocom <- lm(sb_days_ln ~ sb_days_ln_lag + ranked.2006, 
                          data=edb.its.2001.nocommittee)
-model.days_ln.lag.2006.nocom.se <- robust.clusterify(model.days_ln.lag.2006.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.days_ln.lag.2006.nocom.se <- robust.clusterify(model.days_ln.lag.2006.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.cost_ln.lag.2006.nocom <- lm(sb_cost_ln ~ sb_cost_ln_lag + ranked.2006, 
                          data=edb.its.2001.nocommittee)
-model.cost_ln.lag.2006.nocom.se <- robust.clusterify(model.cost_ln.lag.2006.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.cost_ln.lag.2006.nocom.se <- robust.clusterify(model.cost_ln.lag.2006.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.capital_ln.lag.2006.nocom <- lm(sb_capital_ln ~ sb_capital_ln_lag + ranked.2006, 
                             data=edb.its.2001.nocommittee.cap.constrained)
-model.capital_ln.lag.2006.nocom.se <- robust.clusterify(model.capital_ln.lag.2006.nocom, edb.its.2001.nocommittee.cap.constrained, edb.its.2001.nocommittee.cap.constrained$ccode)
+model.capital_ln.lag.2006.nocom.se <- robust.clusterify(model.capital_ln.lag.2006.nocom, edb.its.2001.nocommittee.cap.constrained, "ccode")
 
 
 model.proced.lag.2005.com <- lm(sb_proced ~ sb_proced_lag + ranked.2005, 
                         data=edb.its.2001.committee)
-model.proced.lag.2005.com.se <- robust.clusterify(model.proced.lag.2005.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.proced.lag.2005.com.se <- robust.clusterify(model.proced.lag.2005.com, edb.its.2001.committee, "ccode")
 
 model.days_ln.lag.2005.com <- lm(sb_days_ln ~ sb_days_ln_lag + ranked.2005, 
                          data=edb.its.2001.committee)
-model.days_ln.lag.2005.com.se <- robust.clusterify(model.days_ln.lag.2005.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.days_ln.lag.2005.com.se <- robust.clusterify(model.days_ln.lag.2005.com, edb.its.2001.committee, "ccode")
 
 model.cost_ln.lag.2005.com <- lm(sb_cost_ln ~ sb_cost_ln_lag + ranked.2005, 
                          data=edb.its.2001.committee)
-model.cost_ln.lag.2005.com.se <- robust.clusterify(model.cost_ln.lag.2005.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.cost_ln.lag.2005.com.se <- robust.clusterify(model.cost_ln.lag.2005.com, edb.its.2001.committee, "ccode")
 
 model.capital_ln.lag.2005.com <- lm(sb_capital_ln ~ sb_capital_ln_lag + ranked.2005, 
                             data=edb.its.2001.committee.cap.constrained)
-model.capital_ln.lag.2005.com.se <- robust.clusterify(model.capital_ln.lag.2005.com, edb.its.2001.committee.cap.constrained, edb.its.2001.committee.cap.constrained$ccode)
+model.capital_ln.lag.2005.com.se <- robust.clusterify(model.capital_ln.lag.2005.com, edb.its.2001.committee.cap.constrained, "ccode")
 
 
 model.proced.lag.2006.com <- lm(sb_proced ~ sb_proced_lag + ranked.2006, 
                         data=edb.its.2001.committee)
-model.proced.lag.2006.com.se <- robust.clusterify(model.proced.lag.2006.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.proced.lag.2006.com.se <- robust.clusterify(model.proced.lag.2006.com, edb.its.2001.committee, "ccode")
 
 model.days_ln.lag.2006.com <- lm(sb_days_ln ~ sb_days_ln_lag + ranked.2006, 
                          data=edb.its.2001.committee)
-model.days_ln.lag.2006.com.se <- robust.clusterify(model.days_ln.lag.2006.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.days_ln.lag.2006.com.se <- robust.clusterify(model.days_ln.lag.2006.com, edb.its.2001.committee, "ccode")
 
 model.cost_ln.lag.2006.com <- lm(sb_cost_ln ~ sb_cost_ln_lag + ranked.2006, 
                          data=edb.its.2001.committee)
-model.cost_ln.lag.2006.com.se <- robust.clusterify(model.cost_ln.lag.2006.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.cost_ln.lag.2006.com.se <- robust.clusterify(model.cost_ln.lag.2006.com, edb.its.2001.committee, "ccode")
 
 model.capital_ln.lag.2006.com <- lm(sb_capital_ln ~ sb_capital_ln_lag + ranked.2006, 
                             data=edb.its.2001.committee.cap.constrained)
-model.capital_ln.lag.2006.com.se <- robust.clusterify(model.capital_ln.lag.2006.com, edb.its.2001.committee.cap.constrained, edb.its.2001.committee.cap.constrained$ccode)
+model.capital_ln.lag.2006.com.se <- robust.clusterify(model.capital_ln.lag.2006.com, edb.its.2001.committee.cap.constrained, "ccode")
 
 
 #+ results='asis'
@@ -1020,85 +1020,85 @@ stargazer(model.cost_ln.lag.2005.nocom, model.cost_ln.lag.2005.com,
 model.proced.lag.2005.its.nocom <- lm(sb_proced ~
                                       year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                         data=edb.its.2001.nocommittee)
-model.proced.lag.2005.its.nocom.se <- robust.clusterify(model.proced.lag.2005.its.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.proced.lag.2005.its.nocom.se <- robust.clusterify(model.proced.lag.2005.its.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.days_ln.lag.2005.its.nocom <- lm(sb_days_ln ~
                                        year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                          data=edb.its.2001.nocommittee)
-model.days_ln.lag.2005.its.nocom.se <- robust.clusterify(model.days_ln.lag.2005.its.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.days_ln.lag.2005.its.nocom.se <- robust.clusterify(model.days_ln.lag.2005.its.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.cost_ln.lag.2005.its.nocom <- lm(sb_cost_ln ~
                                        year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                          data=edb.its.2001.nocommittee)
-model.cost_ln.lag.2005.its.nocom.se <- robust.clusterify(model.cost_ln.lag.2005.its.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.cost_ln.lag.2005.its.nocom.se <- robust.clusterify(model.cost_ln.lag.2005.its.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.capital_ln.lag.2005.its.nocom <- lm(sb_capital_ln ~
                                           year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                             data=edb.its.2001.nocommittee.cap.constrained)
-model.capital_ln.lag.2005.its.nocom.se <- robust.clusterify(model.capital_ln.lag.2005.its.nocom, edb.its.2001.nocommittee.cap.constrained, edb.its.2001.nocommittee.cap.constrained$ccode)
+model.capital_ln.lag.2005.its.nocom.se <- robust.clusterify(model.capital_ln.lag.2005.its.nocom, edb.its.2001.nocommittee.cap.constrained, "ccode")
 
 
 model.proced.lag.2006.its.nocom <- lm(sb_proced ~
                                       year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                         data=edb.its.2001.nocommittee)
-model.proced.lag.2006.its.nocom.se <- robust.clusterify(model.proced.lag.2006.its.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.proced.lag.2006.its.nocom.se <- robust.clusterify(model.proced.lag.2006.its.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.days_ln.lag.2006.its.nocom <- lm(sb_days_ln ~
                                        year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                          data=edb.its.2001.nocommittee)
-model.days_ln.lag.2006.its.nocom.se <- robust.clusterify(model.days_ln.lag.2006.its.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.days_ln.lag.2006.its.nocom.se <- robust.clusterify(model.days_ln.lag.2006.its.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.cost_ln.lag.2006.its.nocom <- lm(sb_cost_ln ~
                                        year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                          data=edb.its.2001.nocommittee)
-model.cost_ln.lag.2006.its.nocom.se <- robust.clusterify(model.cost_ln.lag.2006.its.nocom, edb.its.2001.nocommittee, edb.its.2001.nocommittee$ccode)
+model.cost_ln.lag.2006.its.nocom.se <- robust.clusterify(model.cost_ln.lag.2006.its.nocom, edb.its.2001.nocommittee, "ccode")
 
 model.capital_ln.lag.2006.its.nocom <- lm(sb_capital_ln ~
                                           year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                             data=edb.its.2001.nocommittee.cap.constrained)
-model.capital_ln.lag.2006.its.nocom.se <- robust.clusterify(model.capital_ln.lag.2006.its.nocom, edb.its.2001.nocommittee.cap.constrained, edb.its.2001.nocommittee.cap.constrained$ccode)
+model.capital_ln.lag.2006.its.nocom.se <- robust.clusterify(model.capital_ln.lag.2006.its.nocom, edb.its.2001.nocommittee.cap.constrained, "ccode")
 
 
 model.proced.lag.2005.its.com <- lm(sb_proced ~
                                     year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                         data=edb.its.2001.committee)
-model.proced.lag.2005.its.com.se <- robust.clusterify(model.proced.lag.2005.its.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.proced.lag.2005.its.com.se <- robust.clusterify(model.proced.lag.2005.its.com, edb.its.2001.committee, "ccode")
 
 model.days_ln.lag.2005.its.com <- lm(sb_days_ln ~
                                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                          data=edb.its.2001.committee)
-model.days_ln.lag.2005.its.com.se <- robust.clusterify(model.days_ln.lag.2005.its.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.days_ln.lag.2005.its.com.se <- robust.clusterify(model.days_ln.lag.2005.its.com, edb.its.2001.committee, "ccode")
 
 model.cost_ln.lag.2005.its.com <- lm(sb_cost_ln ~
                                      year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                          data=edb.its.2001.committee)
-model.cost_ln.lag.2005.its.com.se <- robust.clusterify(model.cost_ln.lag.2005.its.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.cost_ln.lag.2005.its.com.se <- robust.clusterify(model.cost_ln.lag.2005.its.com, edb.its.2001.committee, "ccode")
 
 model.capital_ln.lag.2005.its.com <- lm(sb_capital_ln ~
                                         year.centered.2005 + ranked.2005 + year.centered.2005 * ranked.2005,
                             data=edb.its.2001.committee.cap.constrained)
-model.capital_ln.lag.2005.its.com.se <- robust.clusterify(model.capital_ln.lag.2005.its.com, edb.its.2001.committee.cap.constrained, edb.its.2001.committee.cap.constrained$ccode)
+model.capital_ln.lag.2005.its.com.se <- robust.clusterify(model.capital_ln.lag.2005.its.com, edb.its.2001.committee.cap.constrained, "ccode")
 
 
 model.proced.lag.2006.its.com <- lm(sb_proced ~ 
                                     year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                         data=edb.its.2001.committee)
-model.proced.lag.2006.its.com.se <- robust.clusterify(model.proced.lag.2006.its.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.proced.lag.2006.its.com.se <- robust.clusterify(model.proced.lag.2006.its.com, edb.its.2001.committee, "ccode")
 
 model.days_ln.lag.2006.its.com <- lm(sb_days_ln ~ 
                                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                          data=edb.its.2001.committee)
-model.days_ln.lag.2006.its.com.se <- robust.clusterify(model.days_ln.lag.2006.its.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.days_ln.lag.2006.its.com.se <- robust.clusterify(model.days_ln.lag.2006.its.com, edb.its.2001.committee, "ccode")
 
 model.cost_ln.lag.2006.its.com <- lm(sb_cost_ln ~ 
                                      year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                          data=edb.its.2001.committee)
-model.cost_ln.lag.2006.its.com.se <- robust.clusterify(model.cost_ln.lag.2006.its.com, edb.its.2001.committee, edb.its.2001.committee$ccode)
+model.cost_ln.lag.2006.its.com.se <- robust.clusterify(model.cost_ln.lag.2006.its.com, edb.its.2001.committee, "ccode")
 
 model.capital_ln.lag.2006.its.com <- lm(sb_capital_ln ~ 
                                         year.centered.2006 + ranked.2006 + year.centered.2006 * ranked.2006,
                             data=edb.its.2001.committee.cap.constrained)
-model.capital_ln.lag.2006.its.com.se <- robust.clusterify(model.capital_ln.lag.2006.its.com, edb.its.2001.committee.cap.constrained, edb.its.2001.committee.cap.constrained$ccode)
+model.capital_ln.lag.2006.its.com.se <- robust.clusterify(model.capital_ln.lag.2006.its.com, edb.its.2001.committee.cap.constrained, "ccode")
 
 
 #+ results='asis'
