@@ -7,3 +7,5 @@ analysis/percent_change_floor.html
 analysis/percent_change_floor_files/
 analysis/analysis.html
 analysis/analysis_files/
+analysis/final_models.html
+analysis/final_models_files/
