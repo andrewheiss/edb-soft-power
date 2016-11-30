@@ -28,10 +28,28 @@ edb.clean <- read_dta(file.path(PROJHOME, "data/MasterWBMarch16_15.dta")) %>%
   mutate_each(funs(ln = log1p(.)), 
               starts_with("sb"), starts_with("con"), gdp, gdpcap, pop, 
               -contains("_reform")) %>%
-  mutate(year.centered.2005 = year - 2005,
+  mutate(year.centered.2003 = year - 2003,
+         year.centered.2004 = year - 2004,
+         year.centered.2005 = year - 2005,
          year.centered.2006 = year - 2006,
+         year.centered.2007 = year - 2007,
+         year.centered.2008 = year - 2008,
+         year.centered.2009 = year - 2009,
+         year.centered.2010 = year - 2010,
+         year.centered.2011 = year - 2011,
+         year.centered.2012 = year - 2012,
+         year.centered.2013 = year - 2013,
+         ranked.2003 = year.centered.2003 >= 0,
+         ranked.2004 = year.centered.2004 >= 0,
          ranked.2005 = year.centered.2005 >= 0,
-         ranked.2006 = year.centered.2006 >= 0) %>%
+         ranked.2006 = year.centered.2006 >= 0,
+         ranked.2007 = year.centered.2007 >= 0,
+         ranked.2008 = year.centered.2008 >= 0,
+         ranked.2009 = year.centered.2009 >= 0,
+         ranked.2010 = year.centered.2010 >= 0,
+         ranked.2011 = year.centered.2011 >= 0,
+         ranked.2012 = year.centered.2012 >= 0,
+         ranked.2013 = year.centered.2013 >= 0) %>%
   group_by(ccode) %>%
   mutate(loan_ln = log1p(sum(ibrd, na.rm=TRUE))) %>%
   mutate_each(funs(lag = lag(.))) %>%
