@@ -92,6 +92,8 @@ robust.clusterify <- function(model, dat, cluster) {
   attach(dat, warn.conflicts = F)
   not <- attr(model$model,"na.action")
   
+  cluster <- dat[[cluster]]
+  
   if( ! is.null(not)) {  # only drop the NA values if there are any left
     cluster <- cluster[-not]
     dat <- dat[-not,]
