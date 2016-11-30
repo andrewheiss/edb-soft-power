@@ -125,3 +125,9 @@ summary.corr <- function(x, y=NULL) {
   out
 }
 
+p.stars <- function(p) {
+  out <- symnum(p, corr=FALSE,
+                cutpoints=c(0, 0.01, 0.05, 0.1, 1),
+                symbols=c("***", "**", "*", " "))
+  as.character(out)
+}
