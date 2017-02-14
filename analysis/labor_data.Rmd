@@ -1,0 +1,389 @@
+---
+title: "Labor index stuff"
+author: "Andrew Heiss"
+date: "`r format(Sys.time(), '%B %e, %Y')`"
+output: 
+  html_document: 
+    css: ../html/fixes.css
+    code_folding: hide
+    toc: yes
+    toc_float: true
+    toc_depth: 4
+    highlight: pygments
+    self_contained: no
+    theme: flatly
+    fig_height: 4
+    fig_width: 6
+    includes:
+      after_body: ../html/add_home_link.html
+---
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+library(rvest)
+library(readxl)
+library(countrycode)
+library(DT)
+
+custom.iso3 <- c(Kosovo = "XKK")
+custom.cown <- c(`Hong Kong SAR, China` = 715L, `Hong Kong` = 715L,
+                 Serbia = 340L, 
+                 Palestine = 669L, `West Bank and Gaza` = 669L)
+custom.name <- c(`340` = "Serbia", `669` = "Palestine", `715` = "Hong Kong")
+
+source(file.path(PROJHOME, "lib", "functions.R"))
+```
+
+## Files from the World Bank
+
+- `Master DB 10 labor coding sheet (all years)_for_Judith.xlsx`: All labor-related ratings from 2004–2010. Contains the formulas derived below.
+- `Copy of LMR-DB17-service-sector-data-points-and-details.xlsx`: Raw data points for labor-related ratings from 2014–2017. No ratings are calculated though, but all the data needed for the rating formulas are included (in addition to a bunch of others that don't get used in the forumlas).
+- `LMR-DB06-DB14-manufacturing-sector-historical-data.xlsx`: Raw data points for labor-related ratings from 2006–2014. No extra variables are included. No ratings are calculated in the sheet, but it can be done with the formulas below. *This file contains more data than the master coding sheet.* For instance, in the master sheet, Afghanistan is missing redundancy cost data, but that data appears here.
+
+```{r fig-sheet-coverage, fig.height=2, fig.width=6}
+sheet.coverage <- tribble(
+  ~year.start, ~year.end, ~sheet,
+  2004,        2010,      "Master DB 10 labor coding sheet…",
+  2014,        2017,      "Copy of LMR-DB17-service…",
+  2006,        2014,      "LMR-DB06-DB14-manufacturing…"
+) %>%
+  gather(key, year, -sheet) %>%
+  mutate(year = ymd(paste0(year, "-01-01")))
+
+ggplot(sheet.coverage, aes(x=sheet, y=year, colour=sheet)) + 
+  geom_line(size=6) + 
+  guides(colour=FALSE) +
+  labs(x=NULL, y=NULL) +
+  coord_flip() +
+  theme_edb(11)
+```
+
+We could use the assumedly more accurate data from the green and red files for 2006–2017 and generate our own labor ratings and rankings. Borrow from blue sheet for 2004 and 2005.
+
+**Best plan**: Only use the green dataset for everything since it's ostensibly the most accurate. The World Bank goes back and updates the historical data, so even though since they go back and update data.
+
+## Labor index formulas
+
+### Difficulty of hiring index
+
+- C: Are fixed-term contracts only allowed for fixed-term tasks?
+
+$$C_1 = 
+\begin{cases}
+  1,   & C = \text{Yes} \\
+  0,   & C = \text{No}
+\end{cases}$$
+
+- D: What is the maximum duration of fixed-term contracts (in months)?
+
+$$D_1 = 
+  \begin{cases}
+  0,   & D \geq 60 \\
+  0.5, & 36 \leq D \lt 60 \\
+  1,   & D \lt 36 
+\end{cases}$$
+
+- E: Ratio of min to average wage
+
+$$E_1 = 
+\begin{cases}
+  1,           & E \geq 0.75 \\
+  \frac{2}{3}, & 0.5 \leq E \lt 0.75 \\
+  \frac{1}{3}, & 0.25 \leq E \lt 0.5 \\
+  0,           & E \lt 0.25
+\end{cases}$$
+
+**Final index:**
+
+$$\text{Hiring} = \frac{C_1 + D_1 + E_1}{3} \times 100$$
+
+
+### Rigidity of hours index
+
+- H: 50 hour weeks for 2 months?
+
+$$H_1 = 
+\begin{cases}
+  0,   & H = \text{Yes} \\
+  1,   & H = \text{No}
+\end{cases}$$
+
+- I: Are there restrictions on night work?
+
+$$I_1 = I$$
+
+- J: Are there restrictions on "weekly holiday" work?
+
+$$J_1 = J$$
+
+- K: What is the maximum number of working days per week?
+
+$$K_1 = 
+\begin{cases}
+  0,   & K \geq 5.5 \\
+  1,   & K \lt 5.5
+\end{cases}$$
+
+- L: Mandatory working days of annual leave with pay in manufacturing after 20 years of continuous employment?
+
+$$L_1 = 
+\begin{cases}
+  0,   & L \leq 21 \\
+  1,   & L \gt 21
+\end{cases}$$
+
+**Final index:**
+
+$$\text{Hours} = (H_1 + I_1 + J_1 + K_1 + L_1) \times 20$$
+
+
+### Difficulty of redundancy index
+
+- O: Is the termination of workers due to redundancy legally authorized?
+
+$$O_1 = 
+\begin{cases}
+  10,  & O = \text{No} \\
+  1,   & O = \text{Yes} \text{ and } Q = \text{Yes} \\
+  0,   & O = \text{Yes} \text{ and } Q = \text{No}
+\end{cases}$$
+
+- Q: Must the employer notify a third party before dismissing one redundant employee?
+    - Nothing: considered in O
+
+- R: Does the employer need the approval of a third party to dismiss one redundant worker?
+
+$$R_1 = 
+\begin{cases}
+  2,   & R = \text{Yes} \\
+  0,   & R = \text{No}
+\end{cases}$$
+
+- S: Must the employer notify a third party prior to a collective dismissal?
+
+$$S_1 = 
+\begin{cases}
+  1,   & S = \text{Yes} \\
+  0,   & S = \text{No}
+\end{cases}$$
+
+- T: Does the employer need the approval of a third party prior to a collective dismissal?
+
+$$T_1 = 
+\begin{cases}
+  1,   & T = \text{Yes} \\
+  0,   & T = \text{No}
+\end{cases}$$
+
+- U: Does the law mandate retraining or reassignment prior to dismissal?
+
+$$U_1 = 
+\begin{cases}
+  1,   & U = \text{Yes} \\
+  0,   & U = \text{No}
+\end{cases}$$
+
+- V: Are there priority rules applying to dismissal or lay-offs?
+
+$$V_1 = 
+\begin{cases}
+  1,   & V = \text{Yes} \\
+  0,   & V = \text{No}
+\end{cases}$$
+
+- W: Are there priority rules applying to re-employment?
+
+$$W_1 = 
+\begin{cases}
+  1,   & W = \text{Yes} \\
+  0,   & W = \text{No}
+\end{cases}$$
+
+**Final index:**
+
+$$\text{Redundancy} = (O_1 + R_1 + S_1 + T_1 + U_1 + V_1 + W_1) \times 10$$
+
+
+### Rigidity of employment index
+
+$$\text{Employment} = \frac{\text{Hiring} + \text{Hours} + \text{Redundancy}}{3}$$
+
+
+### Firing cost index
+
+- AG: Notice
+
+$$AG_1 = AG \text{ (in weeks)}$$
+
+- AH: Severance
+
+$$AH_1 = AH \text{ (in weeks)}$$
+
+- AI: Penalty
+
+$$AI_1 = AI$$
+
+**Final index:**
+
+$$\text{Firing} = 
+\begin{cases}
+    0,                   & \text{if } AG_1 + AH_1 + AI_1 \lt 8 \\
+    AG_1 + AH_1 + AI_1,  & \text{otherwise }
+\end{cases}$$
+
+TODO:
+
+- Account for changes in methdology?
+
+
+## Labor reforms since 2006
+
+The World Bank has data on *Doing Business* [reforms undertaken since 2006](http://www.doingbusiness.org/Reforms/Reforms-Count). Summaries of those reforms from 2008+ are available on each country page (like [Albania](http://www.doingbusiness.org/reforms/overview/economy/albania)). Or, even better, all labor-specific reforms are [listed on their own page](http://www.doingbusiness.org/reforms/overview/topic/labor-market-regulation), divided by country and year.
+
+With this information, we can calculate how many labor reforms countries have undertaken in almost every year. We can count the reforms from 2008–2017 from the country pages, then if that total is different from what's listed in the main count of reforms, we can assume that the difference happened in 2006 or 2007.
+
+```{r count-all-reforms, message=FALSE}
+# This data was copied by hand from 
+# http://www.doingbusiness.org/Reforms/Reforms-Count. It would have been nice 
+# to use rvest to scrape it directly, but the World Bank doesn't use semantic 
+# HTML tables and instead has everything structured as nested divs that are
+# generated with some Javascript(?), so it's a horrible mess.
+labor.reforms.count <- read_csv(file.path(PROJHOME, "data",
+                                          "labor_reforms_count.csv")) %>%
+  mutate(iso3 = countrycode(country, "country.name", "iso3c", custom_match=custom.iso3),
+         cowcode = countrycode(country, "country.name", "cown", custom_match=custom.cown))
+
+reforms.since.2006 <- labor.reforms.count %>%
+  select(cowcode, num.since.2006 = num_labor_reforms)
+```
+
+```{r labor-reform-details, message=FALSE}
+# This data was copied by hand from http://www.doingbusiness.org/reforms/overview/topic/labor-market-regulation
+labor.reforms.clean <- read_csv(file.path(PROJHOME, "data",
+                                          "labor_reforms_raw.csv")) %>%
+  mutate(iso3 = countrycode(country, "country.name", "iso3c", custom_match=custom.iso3),
+         cowcode = countrycode(country, "country.name", "cown", custom_match=custom.cown))
+
+reforms.since.2008 <- labor.reforms.clean %>%
+  group_by(cowcode) %>%
+  summarise(num.since.2008 = n())
+```
+
+However, the count of reforms listed by the [World Bank](http://www.doingbusiness.org/Reforms/Reforms-Count) does not line up with the number of individual "Labor Market Reforms" listed on the summary of each economy's reforms. Portugal, for instance, has 4 labor reforms since 2006 listed in the main table, but it has [7 entries on its main page](http://www.doingbusiness.org/reforms/overview/economy/portugal) explaining all reforms since 2008. 
+
+```{r compare-labor-reform-counts, message=FALSE}
+reforms.compare <- reforms.since.2006 %>%
+  full_join(reforms.since.2008, by="cowcode") %>%
+  mutate(same = num.since.2006 == num.since.2008,
+         same = ifelse(is.na(same), FALSE, same)) %>%
+  mutate(country = countrycode(cowcode, "cown", "country.name.en", custom_match=custom.name))
+
+reforms.compare %>% select(country, everything()) %>% datatable()
+```
+
+\
+
+It seems that the count of reforms listed on the main page takes positive and negative reforms into account and shows the net number of reforms? It's hard to tell immediately because the descriptions of the labor reforms do not have a ✔ or a ✖ before them to show if they're good or bad. 
+
+So, we have to reverse engineer the World Bank's positive/negative assignment, based on the [their methodology](http://www.doingbusiness.org/Methodology/Labor-Market-Regulation) and guesswork. Portugal has too many, and it's unclear if they're positive or negative, so we look at Hungary, since its 2006 and 2008 numbers match ([summary page](http://www.doingbusiness.org/reforms/overview/economy/italy)):
+
+```{r hungary-reform-description}
+labor.reforms.clean %>% 
+  filter(iso3 == "HUN") %>% 
+  select(year, reform_description) %>%
+  datatable()
+```
+
+\
+
+But no! They might not match! The 2014 reform looks like it's positive (reducing the premium for night work and increasing the minimum wage), but the 2016 and 2017 reforms contradict each other and cancel each other out. There are a couple possible reasons Hungary has three overall reforms:
+
+- The World Bank is counting all three of the reforms and the net number is not actually a net number
+- The reforms in 2016 and 2017 cancel each other out, leaving 1 reform since 2008, which means that 2 reforms happened in 2006 or 2007
+
+A different country might help explain this discrepancy. Italy has 4 reforms [listed in its summary page](http://www.doingbusiness.org/reforms/overview/economy/italy), but only 3 in the [total count of reforms](http://www.doingbusiness.org/Reforms/Reforms-Count).
+
+```{r ital-reform-description}
+labor.reforms.clean %>% 
+  filter(iso3 == "ITA") %>% 
+  select(year, reform_description) %>%
+  datatable()
+```
+
+\
+
+The 2016 reform clearly looks positive. The 2010 law that allows the use of fixed-term contracts for permanent tasks goes directly along with [one of the components of the difficulty of hiring index](#difficulty_of_hiring_index), so it's a positive reform. The 2015 law reduced the maxium duration of fixed-term contracts to 36 months, and in the index a higher maximum is better, so that's a negative reform. The 2009 law that increases the notice period for dismissal is a negative reform, since it's part of the [firing cost index](#firing_cost_index).
+
+So, it looks like
+
+- 2016 = positive (1)
+- 2015 = negative (0)
+- 2010 = positive (1)
+- 2009 = negative (0)
+
+That's a net of 0. This means there are multiple ways to get to the 3 that the [World Bank lists in their total count since 2006](http://www.doingbusiness.org/Reforms/Reforms-Count):
+
+- I'm not counting the positivity or negativity of the reforms correctly and some of the negative reforms are really positive
+- 3 positive reforms happened in 2006 or 2007 and therefore aren't listed in the summary
+- I'm not counting the positivity or negativity of the reforms correctly and *some* of the negative ones are really positive *and* some number of positive reforms happened in 2006 or 2007
+- The total count of reforms is not a net amount—but if that's the case, the table is missing a reform, since there are 4 listed in the summary
+
+That doesn't help at all.
+
+We can at least figure out if the total score is a net value by looking at a reform area that indicates positivity and negativity. Hungary has 6 "Paying Taxes" reforms [listed on its summary page](http://www.doingbusiness.org/reforms/overview/economy/hungary): 4 are positive (✔) and 2 are negative (✖). Hungary's [total count of "Paying Taxes" reforms is 5](http://www.doingbusiness.org/Reforms/Reforms-Count). This leaves a couple possibilities:
+
+- If the count is a net value, 3 positive tax-related reforms happened in 2006 or 2007. This seems unlikely.
+- If the count only looks at positive reforms and ignores negative reforms, 1 positive tax-related reform happened in 2006 or 2007. That seems more likely.
+
+So the total count is not a net amount, it's just **the number of positive reforms** (and it ignores negative reforms). 
+
+If we look back at Hungary's labor reforms, the 2016 and 2017 reforms don't cancel each other out—instead, only one of them counts as a positive reform. So there are two positive reforms between 2008–2017 and one unknown positive reform in 2006 or 2007, making a total of 3 (which is what the World Bank lists as the final count).
+
+With Italy, there are at least 2 positive reforms (2016 and 2010), which means 1 reform is unaccounted for. This could be:
+
+- One of the 2015 or 2009 reforms, counted as positive instead of negative
+- One unknown reform passed in 2006 or 2007
+
+Without knowing exactly which reforms are positive (and therefore counted), we risk misplacing reforms in 2006/07. Depending on how we characterize its reforms, Italy could have positive reforms in any of these combinations of years:
+
+- 2016, 2010, 2006/07
+- 2016, 2015, 2010
+- 2016, 2010, 2009
+
+So figuring out the number of reforms completed each year is a lot trickier than we had thought.
+
+
+## Determining effect of being publicly ranked
+
+Ideally, we want to build interrupted time series models that show the effect of being publicly ranked on labor reforms. Something like this:
+
+```{r example-its, fig.height=2, fig.width=4}
+df.example <- data_frame(year = 2007:2014) %>%
+  mutate(value = c(50, 45, 47, 51, 80, 81, 79, 71))
+
+ggplot(df.example, aes(x=year, y=value)) + 
+  geom_point() + geom_line() +
+  geom_vline(xintercept=2010) +
+  labs(x=NULL, y="Some labor-related value") +
+  theme_edb()
+```
+
+We can look at different outcomes, like the number of days of vacation, ratio of minimum to average wage, notice period for dismissal, and severance pay. However, most of the components of the labor index are binary variables instead of continuous. For these binary indicators we can either look at the proportion of countries with/without them before/after 2010 or look at the subindex (like rigidity of employment or rigidity of hours).
+
+The ITS models are defined like this: `lm(some_variable ~ year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010)`
+
+We can also look at the effect of ranking position instead of the effect of just being ranked. Labor rankings are included in the original Stata file as `p_employ_rank`, but only until 2010.
+
+The number of positive labor reforms is ostensibly available from the [World Bank website](http://www.doingbusiness.org/Reforms/Reforms-Count) and from the data we received directly from EDB, but it's hard to use that data right now ([as described above](#labor_reforms_since_2006)).
+
+---
+
+Break year stuff:
+
+2011 report issued in October 2010; it's the first to not include labor stuff in the overall rankings - break year = 2010
+
+- Years 12–14
+- Year 11 separately
+- Years 06–10 (with inferred for 06 and 07)
+- Average for each of those
