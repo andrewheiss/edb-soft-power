@@ -22,3 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - [Percent change with floor](analysis/percent_change_floor.html)
 - [General analysis](analysis/analysis.html)
 - [Final models](analysis/final_models.html)
+
+## Labor ratings
+
+- [Labor index stuff](analysis/labor_data.html)

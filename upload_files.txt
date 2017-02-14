@@ -9,3 +9,6 @@ analysis/analysis.html
 analysis/analysis_files/
 analysis/final_models.html
 analysis/final_models_files/
+analysis/labor_data.html
+analysis/labor_data_files/
+
