@@ -371,7 +371,9 @@ ggplot(df.example, aes(x=year, y=value)) +
 
 We can look at different outcomes, like the number of days of vacation, ratio of minimum to average wage, notice period for dismissal, and severance pay. However, most of the components of the labor index are binary variables instead of continuous. For these binary indicators we can either look at the proportion of countries with/without them before/after 2010 or look at the subindex (like rigidity of employment or rigidity of hours).
 
-The ITS models are defined like this: `lm(some_variable ~ year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010)`
+The ITS models are defined like this: 
+
+    lm(some_variable ~ year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010)
 
 We can also look at the effect of ranking position instead of the effect of just being ranked. Labor rankings are included in the original Stata file as `p_employ_rank`, but only until 2010.
 
