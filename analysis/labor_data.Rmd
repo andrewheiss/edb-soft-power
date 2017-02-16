@@ -24,9 +24,11 @@ library(lubridate)
 library(rvest)
 library(readxl)
 library(countrycode)
+library(pander)
 library(DT)
 library(stargazer)
 library(ggbeeswarm)
+library(gridExtra)
 
 custom.iso3 <- c(Kosovo = "XKK")
 custom.cown <- c(`Hong Kong SAR, China` = 715L, `Hong Kong` = 715L,
@@ -517,6 +519,8 @@ edb.labor.indexes <- raw.labor %>%
   mutate(ccode = as.numeric(ccode))
 ```
 
+**POINTS ARE BAD.**
+
 How to interpret coefficients:
  
 - β~0~ = Constant: pre-period intercept - baseline pre intervention
@@ -547,24 +551,89 @@ its.index.firing <- lm(index.firing ~
                          year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010,
                        data=edb.its.labor)
 
+col.labs <- c("Difficulty of hiring", "Rigidity of hours", "Difficulty of firing",
+              "Rigidity of employment", "Firing cost")
+
 stargazer(its.index.difficulty.hiring, its.index.rigidity.hours, its.index.difficulty.redundancy,
           its.index.rigidity.employment, its.index.firing,
-          type="html")
+          type="html", dep.var.labels=col.labs, keep.stat=c("n", "rsq", "adj.rsq"))
 ```
+
+\
 
 There's a super significant treatment effect for the firing index. It looks super stark too:
 
-```{r}
+```{r warning=FALSE}
 ggplot(edb.its.labor, aes(x=year, y=index.firing)) + 
   geom_vline(xintercept=2010, size=5, alpha=0.2) +
-  geom_quasirandom(size=0.25) + 
+  geom_quasirandom(size=0.25) +
   scale_x_continuous(breaks=2004:2014) +
+  labs(x=NULL, y="Firing cost index", title="Firing cost index") +
   theme_edb() + theme(panel.grid.minor=element_blank(),
                       panel.grid.major.x=element_blank())
 ```
 
 But that's got to be a weird artifact in the data, like a variable that's not getting counted or something. It's unlikely that this subindex is comparable over time.
 
+Instead of looking at subindexes, can we see any effect in the actual underlying indicators?
+
+```{r fig.width=8, warning=FALSE}
+plot.notice <- ggplot(edb.labor.indexes, 
+                      aes(x=year, y=AG1, colour=as.factor(ccode))) + 
+  geom_vline(xintercept=2010, size=5, alpha=0.2) +
+  geom_line(size=0.25) + 
+  guides(colour=FALSE) +
+  labs(x=NULL, y="Notice period", title="Notice period for redundancy dismissal") +
+  theme_edb()
+
+plot.severance <- ggplot(edb.labor.indexes, 
+                         aes(x=year, y=AH1, colour=as.factor(ccode))) + 
+  geom_vline(xintercept=2010, size=5, alpha=0.2) +
+  geom_line(size=0.25) +
+  guides(colour=FALSE) +
+  labs(x=NULL, y="Severance pay", title="Severance pay for redundancy dismissal") +
+  theme_edb()
+
+grid::grid.newpage()
+grid::grid.draw(cbind(ggplotGrob(plot.notice), ggplotGrob(plot.severance)))
+```
+
+```{r warning=FALSE}
+ggplot(edb.labor.indexes,
+       aes(x=year, y=paid.annual.leave, colour=as.factor(ccode))) +
+  geom_vline(xintercept=2010, size=5, alpha=0.2) +
+  geom_line(size=0.25) +
+  guides(colour=FALSE) +
+  labs(x=NULL, y="Days of paid annual leave", title="Paid annual leave",
+       subtitle="The drop in 2010 is likely due to a change in EDB methodology") +
+  theme_edb()
+```
+
+```{r}
+df.fixed.term <- edb.labor.indexes %>%
+  mutate(fixed.term.contracts = recode(fixed.term.contracts, "0" = "No")) %>%
+  filter(!is.na(fixed.term.contracts)) %>%
+  group_by(year, fixed.term.contracts) %>%
+  summarise(num = n()) %>%
+  group_by(year) %>%
+  mutate(total.in.year = sum(num),
+         prop = num / total.in.year) %>%
+  filter(fixed.term.contracts == "Yes")
+
+plot.fixed1 <- ggplot(df.fixed.term, aes(x=year, y=prop)) + 
+  geom_vline(xintercept=2010, size=5, alpha=0.2) +
+  geom_line(size=0.25) +
+  scale_y_continuous(labels=scales::percent) +
+  labs(x=NULL, y="Proportion", 
+       title="Proportion of countries that limit\nfixed-term contracts to fixed-term tasks") +
+  theme_edb()
+
+plot.fixed2 <- plot.fixed1 + coord_cartesian(ylim=c(0, 0.4)) + 
+  labs(x=NULL, y="Proportion", title=NULL)
+
+grid::grid.newpage()
+grid::grid.draw(cbind(ggplotGrob(plot.fixed1), ggplotGrob(plot.fixed2)))
+```
 
 ---
 
