@@ -641,7 +641,79 @@ Break year stuff:
 
 2011 report issued in October 2010; it's the first to not include labor stuff in the overall rankings - break year = 2010
 
-- Years 12–14
-- Year 11 separately
-- Years 06–10 (with inferred for 06 and 07)
-- Average for each of those
+---
+
+## Positive and negative reforms
+
+```{r message=FALSE}
+reforms.coded <- read_csv(file.path(PROJHOME, "data", "labor_reforms_coded_ah.csv"))
+
+```
+
+### Reforms per year
+
+```{r}
+reforms.per.year <- reforms.coded %>%
+  group_by(year) %>%
+  summarise_at(vars(reforms_positive, reforms_negative), funs(sum)) %>%
+  mutate(reforms_net = reforms_positive - reforms_negative)
+```
+
+```{r}
+plot.reforms.per.year <- reforms.per.year %>%
+  mutate(reforms_negative = -reforms_negative) %>%
+  gather(key, value, -year) %>%
+  mutate(key = factor(key, levels=c("reforms_positive", "reforms_negative", "reforms_net"),
+                      labels=c("Positive", "Negative", "Net"),
+                      ordered=TRUE)) %>%
+  mutate(net = key == "Net")
+
+ggplot(plot.reforms.per.year, aes(x=year, y=value, colour=key)) +
+  geom_hline(yintercept=0) +
+  geom_vline(xintercept=2010, size=5, alpha=0.2) +
+  geom_line(aes(linetype=net), size=0.5) +
+  labs(x=NULL, y="Total global reforms",
+       title="Total number of labor reforms, by year") +
+  scale_x_continuous(breaks=2004:2017) +
+  scale_colour_manual(values=c("#2ECC40", "#FF4036", "#0073D9")) +
+  scale_linetype_manual(values=c("dashed", "solid")) +
+  guides(colour=guide_legend(title=NULL), linetype=FALSE) +
+  theme_edb() + theme(panel.grid.minor.x=element_blank(),
+                      panel.grid.major.x=element_blank())
+```
+
+```{r}
+reforms.per.year %>% datatable()
+```
+
+### Attempt at copying EDB coding
+
+I coded each reform individually, so if the EDB listed multiple reforms in a year, I counted each separately. The EDB, though, seems to just count a single positive reform if there are 1+ reforms in the year.
+
+```{r}
+reforms.per.year.edb <- reforms.coded %>%
+  mutate(cowcode = countrycode(country, "country.name.en", "cown", custom_match=custom.cown)) %>%
+  group_by(cowcode, year) %>%
+  summarise(total = reforms_positive > 0) %>%
+  group_by(cowcode) %>%
+  summarise(total.coded = sum(total))
+
+reforms.compare.hand.coded <- reforms.since.2006 %>%
+  full_join(reforms.per.year.edb, by="cowcode") %>%
+  mutate(same = num.since.2006 == total.coded,
+         same = ifelse(is.na(same), FALSE, same)) %>%
+  mutate(country = countrycode(cowcode, "cown", "country.name.en", 
+                               custom_match=custom.name)) %>%
+  select(country, everything())
+
+reforms.compare.hand.coded %>% datatable()
+```
+
+\
+
+The two measures of reforms don't line up perfectly, though:
+
+```{r results="asis"}
+count(reforms.compare.hand.coded, same) %>% pandoc.table()
+```
+
