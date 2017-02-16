@@ -25,14 +25,18 @@ library(rvest)
 library(readxl)
 library(countrycode)
 library(DT)
+library(stargazer)
+library(ggbeeswarm)
 
 custom.iso3 <- c(Kosovo = "XKK")
 custom.cown <- c(`Hong Kong SAR, China` = 715L, `Hong Kong` = 715L,
                  Serbia = 340L, 
                  Palestine = 669L, `West Bank and Gaza` = 669L)
 custom.name <- c(`340` = "Serbia", `669` = "Palestine", `715` = "Hong Kong")
+custom.iso.cow <- c(HKG = 715L, KSV = 347L, PRI = NA, ROM = 360L, SRB = 340L, TMP = 860L, WBG = 669L, ZAR = 490L)
 
 source(file.path(PROJHOME, "lib", "functions.R"))
+source(file.path(PROJHOME, "data", "clean_data.R"))
 ```
 
 ## Files from the World Bank
@@ -378,6 +382,189 @@ The ITS models are defined like this:
 We can also look at the effect of ranking position instead of the effect of just being ranked. Labor rankings are included in the original Stata file as `p_employ_rank`, but only until 2010.
 
 The number of positive labor reforms is ostensibly available from the [World Bank website](http://www.doingbusiness.org/Reforms/Reforms-Count) and from the data we received directly from EDB, but it's hard to use that data right now ([as described above](#labor_reforms_since_2006)).
+
+## ITS models
+
+```{r}
+raw.labor.file <- "/Users/andrew/Dropbox/Andrew/EDB/*Labor data/LMR-DB06-DB14-manufacturing-sector-historical-data.xlsx"
+
+raw.labor <- 1:9 %>% 
+  map(~ read_excel(raw.labor.file, sheet=.x, skip=2, na=c("..")) %>%
+        magrittr::set_colnames(make.names(colnames(.), unique=TRUE))) %>% 
+  bind_rows(.id="id") %>%
+  select(-starts_with("NA"), -starts_with("X")) %>%
+  mutate(Code = ifelse(is.na(Code), Code., Code)) %>%
+  filter(!is.na(Code)) %>%
+  mutate(year = 2015 - as.numeric(id)) %>%
+  mutate(ccode = countrycode(Code, "iso3c", "cown", custom_match=custom.iso.cow)) %>%
+  filter(!is.na(ccode)) %>%
+  select(ccode, year,
+         fixed.term.contracts = Are.fixed.term.contracts.prohibited.for.permanent.tasks.,
+         fixed.term.contracts.max.duration = What.is.the.maximum.cumulative.duration.of.a.fixed.term.employment.relationship..in.months...including.all.renewals..,
+         extend.workweek = Can.the.workweek.for.a.single.worker.extend.to.50.hours.per.week..including.overtime..for.2.months.each.year.to.respond.to.a.seasonal.increase.in.production.,
+         restrict.night = Are.there.restrictions.on.night.work.,
+         restrict.holiday = Are.there.restrictions.on..weekly.holiday..work.,
+         max.working.days.week = What.is.the.maximum.number.of.working.days.per.week.,
+         paid.annual.leave.20 = Mandatory.working.days.of.annual.leave..i.e..vacation..with.pay.in.manufacturing.after.20.years.of.continuous.employment..,
+         paid.annual.leave.1 = Paid.annual.leave..working.days....1.year,
+         paid.annual.leave.5 = Paid.annual.leave..working.days....5.years,
+         paid.annual.leave.10 = Paid.annual.leave..working.days....10.years,
+         redundancy.can.fire = Is.it.legal.for.an.employer.to.terminate.the.employment.contract.of.a.worker.on.the.basis.of.redundancy.,
+         redundancy.notify.3rd.party = Must.the.employer.notify.a.third.party.before.dismissing.one.redundant.worker.,
+         redundancy.approve.3rd.party = Does.the.employer.need.the.approval.of.a.third.party.in.order.to.dismiss.one.redundant.worker.,
+         redundancy.notify.3rd.party.collective = Must.the.employer.notify.or.consult.a.third.party.prior.to.a.collective.dismissal.,
+         redundancy.notify.3rd.party.collective.9 = Must.the.employer.notify.or.consult.a.third.party.prior.to.a.collective.dismissal..9.employees..,
+         redundancy.approve.3rd.party.collective = Must.the.employer.obtain.prior.approval.from.a.third.party.before.a.collective.dismissal.,
+         redundancy.approve.3rd.party.collective.9 = Must.the.employer.obtain.prior.approval.from.a.third.party.before.a.collective.dismissal..9.employees..,
+         redundancy.retrain.first = Is.there.a.retraining.or.reassignment.obligation.before.an.employer.can.make.a.worker.redundant.,
+         redundancy.priority.fire = Are.there.priority.rules.that.apply.to.redundancy.dismissals.or.lay.offs.,
+         priority.reemployment = Are.there.priority.rules.applying.to.re.employment.,
+         notice.period.20 = notice.period.for.redundancy.dismissal.after.20.years.of.continuous.employment,
+         notice.period.1 = Notice.period.for.redundancy.dismissal.after.1.year.of.continuous.employment,
+         notice.period.5 = Notice.period.for.redundancy.dismissal.after.5.years.of.continuous.employment,
+         notice.period.10 = Notice.period.for.redundancy.dismissal.after.10.years.of.continuous.employment,
+         severance.pay.20 = severance.pay.for.redundancy.dismissal.after.20.years.of.continuous.employment,
+         severance.pay.1 = Severance.pay.for.redundancy.dismissal.after.1.year.of.continuous.employment,
+         severance.pay.5 = Severance.pay.for.redundancy.dismissal.after.5.years.of.continuous.employment,
+         severance.pay.10 = Severance.pay.for.redundancy.dismissal.after.10.years.of.continuous.employment,
+         redundancy.firing.penalty.20 = penalty.for.redundancy.dismissal.after.20.years.of.continuous.employment,
+         redundancy.firing.penalty = Average.penalty.for.redundancy.dismissal.after.1..5.and.10.years.of.continuous.employment)
+
+
+edb.labor.indexes <- raw.labor %>%
+  #
+  # Difficulty of hiring index
+  #
+  # ¡OH NO! No data on ratio of minimum to average wage! For now we just ignore it.
+  mutate(C1 = ifelse(fixed.term.contracts == "Yes", 1, 0),
+         D1 = recode(fixed.term.contracts.max.duration, 
+                     `No limit` = "100", `No Limit` = "100"),
+         D1 = as.numeric(D1)) %>%
+  mutate(D1 = case_when(
+    .$D1 >= 60 ~ 0,
+    .$D1 >= 36 & .$D1 < 60 ~ 0.5,
+    .$D1 < 36 ~ 1
+  )) %>%
+  # mutate(index.difficulty.hiring = (C1 + D1 + E1) / 3 * 100)
+  mutate(index.difficulty.hiring = (C1 + D1) / 2 * 100) %>%
+  #
+  # Rigidity of hours index
+  #
+  # ¡OH NO! EDB changed how paid annual leave is counted after 2010 and stopped
+  # looking at average numbers after 20 years of employment. For our sakes, we
+  # use their numbers for 10 years of employment when 20-year data isn't
+  # available.
+  #
+  # Also, ¡OH NO! the historical data only includes binary yes/no values for
+  # restrict.night and restrict.holidy, but the Excel sheet with the final
+  # calculated indexes uses 0, 0.33, 0.67, and 1. So the subindex isn't
+  # comparable.
+  mutate(paid.annual.leave = ifelse(is.na(paid.annual.leave.20), 
+                                    paid.annual.leave.10, paid.annual.leave.20)) %>%
+  mutate(H1 = ifelse(extend.workweek == "Yes", 0, 1),
+         I1 = ifelse(restrict.night == "Yes", 1, 0),
+         J1 = ifelse(restrict.holiday == "Yes", 1, 0),
+         K1 = ifelse(max.working.days.week >= 5.5, 0, 1),
+         L1 = ifelse(paid.annual.leave > 21, 1, 0)) %>%
+  mutate(index.rigidity.hours = (H1 + I1 + J1 + K1 + L1) * 20) %>%
+  #
+  # Difficulty of redundancy (difficulty of firing) index
+  #
+  # ¡OH NO! EDB changed how many employees count as a colelctive dismissal.
+  # Here we just merge in the 9-person-group definition with the previous
+  # definition.
+  mutate_at(vars(starts_with("redundancy"), priority.reemployment), 
+            funs(ifelse(. == 0, "No",
+                        ifelse(. == "N/A", NA, .)))) %>%
+  mutate(O1 = case_when(
+    .$redundancy.can.fire == "No" ~ 10,
+    .$redundancy.can.fire == "Yes" & .$redundancy.notify.3rd.party == "Yes" ~ 1,
+    .$redundancy.can.fire == "Yes" & .$redundancy.notify.3rd.party == "No" ~ 0
+  )) %>%
+  mutate(redundancy.notify.3rd.party.collective =
+           ifelse(is.na(redundancy.notify.3rd.party.collective),
+                  redundancy.notify.3rd.party.collective.9,
+                  redundancy.notify.3rd.party.collective)) %>%
+  mutate(redundancy.approve.3rd.party.collective =
+           ifelse(is.na(redundancy.approve.3rd.party.collective),
+                  redundancy.approve.3rd.party.collective.9,
+                  redundancy.approve.3rd.party.collective)) %>%
+  mutate(R1 = ifelse(redundancy.approve.3rd.party == "Yes", 2, 0),
+         S1 = ifelse(redundancy.notify.3rd.party.collective == "Yes", 1, 0),
+         T1 = ifelse(redundancy.approve.3rd.party.collective == "Yes", 1, 0),
+         U1 = ifelse(redundancy.retrain.first == "Yes", 1, 0),
+         V1 = ifelse(redundancy.priority.fire == "Yes", 1, 0),
+         W1 = ifelse(priority.reemployment == "Yes", 1, 0)) %>%
+  mutate(index.difficulty.redundancy = (O1 + R1 + S1 + T1 + U1 + V1 + W1) * 10) %>%
+  #
+  # Rigidity of employment index
+  mutate(index.rigidity.employment = (index.difficulty.hiring + index.rigidity.hours +
+                                        index.difficulty.redundancy) / 3) %>%
+  #
+  # Firing cost index
+  #
+  # ¡OH NO! Again, EDB changed the length of employment. We use 10 years when 20 years is missing
+  mutate(notice.period = ifelse(is.na(notice.period.20), notice.period.10, notice.period.20),
+         severance.pay = ifelse(is.na(severance.pay.20), severance.pay.10, severance.pay.20),
+         redundancy.penalty = ifelse(is.na(redundancy.firing.penalty.20),
+                                     redundancy.firing.penalty, 
+                                     redundancy.firing.penalty.20)) %>%
+  mutate(AG1 = readr::parse_number(notice.period, na="not possible"),
+         AH1 = readr::parse_number(severance.pay, na="not possible"),
+         AI1 = ifelse(redundancy.penalty == "No", 0, redundancy.penalty),
+         AI1 = readr::parse_number(AI1, na="not possible")) %>%
+  mutate(index.firing = ifelse(AG1 + AH1 + AI1 < 8, 0, AG1 + AH1 + AI1)) %>%
+  mutate(ccode = as.numeric(ccode))
+```
+
+How to interpret coefficients:
+ 
+- β~0~ = Constant: pre-period intercept - baseline pre intervention
+- β~1~ = `year.centered`: pre-period slope - baseline time trend - level of increase prior to intervention
+- β~2~ = `ranked`: immediate effect of the event - change in intercept at point of experiment - **generally what we care about**
+- β~3~ = `year.centered:ranked`: change in slope after the experiment - what happens after
+
+```{r its-labor-subindexes-models, results="asis"}
+edb.its.labor <- edb.its %>%
+  left_join(edb.labor.indexes, by=c("ccode", "year"))
+
+
+its.index.difficulty.hiring <- lm(index.difficulty.hiring ~ 
+                         year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010,
+                       data=edb.its.labor)
+its.index.rigidity.hours <- lm(index.rigidity.hours ~ 
+                         year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010,
+                       data=edb.its.labor)
+its.index.difficulty.redundancy <- lm(index.difficulty.redundancy ~ 
+                         year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010,
+                       data=edb.its.labor)
+
+its.index.rigidity.employment <- lm(index.rigidity.employment ~ 
+                         year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010,
+                       data=edb.its.labor)
+
+its.index.firing <- lm(index.firing ~ 
+                         year.centered.2010 + ranked.2010 + year.centered.2010 * ranked.2010,
+                       data=edb.its.labor)
+
+stargazer(its.index.difficulty.hiring, its.index.rigidity.hours, its.index.difficulty.redundancy,
+          its.index.rigidity.employment, its.index.firing,
+          type="html")
+```
+
+There's a super significant treatment effect for the firing index. It looks super stark too:
+
+```{r}
+ggplot(edb.its.labor, aes(x=year, y=index.firing)) + 
+  geom_vline(xintercept=2010, size=5, alpha=0.2) +
+  geom_quasirandom(size=0.25) + 
+  scale_x_continuous(breaks=2004:2014) +
+  theme_edb() + theme(panel.grid.minor=element_blank(),
+                      panel.grid.major.x=element_blank())
+```
+
+But that's got to be a weird artifact in the data, like a variable that's not getting counted or something. It's unlikely that this subindex is comparable over time.
+
 
 ---
 
