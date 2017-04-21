@@ -22,6 +22,8 @@
 library(tidyverse)
 library(broom)
 library(lubridate)
+library(purrr)
+library(forcats)
 library(lazyeval)
 library(ggstance)
 library(gridExtra)
@@ -46,13 +48,63 @@ plot.edb <- edb.its %>%
   gather(variable, value, -year) %>%
   group_by(year, variable) %>%
   summarise(avg = mean(value, na.rm=TRUE)) %>%
-  filter(!is.nan(avg))
+  filter(!is.nan(avg)) %>%
+  filter(year >= 2003) %>%
+  mutate(variable = fct_recode(variable,
+                               `Contract—Days` = "con_days",
+                               `Contract—Procedures` = "con_proced",
+                               `Starting a business—Capital` = "sb_capital",
+                               `Starting a business—Cost` = "sb_cost",
+                               `Starting a business—Days` = "sb_days",
+                               `Starting a business—Procedures` = "sb_proced"))
 
 plot.interventions <- data_frame(year = 2005:2006,
                                  intervention = c("2005", "2006"))
 
+make.facet <- function(x, ymin, ymax, ylab) {
+  plot.data <- plot.edb %>%
+    filter(variable == x)
+  
+  facet <- ggplot(plot.data, aes(x=year, y=avg)) +
+    geom_vline(data=plot.interventions, aes(xintercept=year,
+                                            colour=intervention),
+               linetype="dashed", size=0.5) +
+    geom_line() + 
+    scale_color_manual(values=c("red", "blue"), name=NULL) +
+    scale_x_continuous(limits=c(2000, 2015), breaks=seq(2000, 2015, 5)) +
+    coord_cartesian(xlim=c(2000, 2015), ylim=c(ymin, ymax)) +
+    guides(color=FALSE) +
+    labs(x=NULL, y=ylab, title=x) +
+    theme_edb() + theme(plot.title = element_text(size=rel(1), hjust=0.5))
+  
+  return(facet)
+}
+
+plots <- tribble(
+  ~ymin, ~ymax, ~ylab,        ~variable,
+  0,     610,   "Days",       "Contract—Days",
+  0,     45,    "Procedures", "Contract—Procedures",
+  0,     200,   "Capital",    "Starting a business—Capital",
+  0,     100,   "Cost",       "Starting a business—Cost",
+  0,     50,    "Days",       "Starting a business—Days",
+  0,     10,    "Procedures", "Starting a business—Procedures"
+) %>%
+  mutate(facet = pmap(.l=list(variable, ymin, ymax, ylab), make.facet))
+
+plot.edb.better <- arrangeGrob(grobs=plots$facet, nrow=2)
+grid::grid.newpage()
+grid::grid.draw(plot.edb.better)
+
+ggsave(plot.edb.better, 
+       filename=file.path(PROJHOME, "figures/starting_business_its_no_title.pdf"),
+       width=9, height=4.5, units="in", device=cairo_pdf)
+ggsave(plot.edb.better, 
+       filename=file.path(PROJHOME, "figures/starting_business_its_no_title.png"),
+       width=9, height=4.5, units="in", type="cairo", dpi=300)
+
+
 #+ fig.width=9, fig.height=5.5
-ggplot(plot.edb, aes(x=year, y=avg)) +
+plot.nice <- ggplot(plot.edb, aes(x=year, y=avg)) +
   geom_vline(data=plot.interventions, aes(xintercept=year,
                                           colour=intervention),
              linetype="dashed", size=0.5) +
@@ -60,10 +112,17 @@ ggplot(plot.edb, aes(x=year, y=avg)) +
   scale_color_manual(values=c("red", "blue"), name=NULL) +
   scale_x_continuous(limits=c(2000, 2015), breaks=seq(2000, 2015, 5)) +
   coord_cartesian(xlim=c(2000, 2015)) +
-  labs(x=NULL, y=NULL, title="Average values of sb variables over time",
+  labs(x=NULL, y=NULL, title="Average values of starting a business variables over time",
        subtitle="Only countries included in 2004 report") +
   facet_wrap(~ variable, scales="free_y") + 
   theme_edb()
+plot.nice
+
+ggsave(plot.nice, filename=file.path(PROJHOME, "figures/starting_business_its.pdf"),
+       width=9, height=5.5, units="in", device=cairo_pdf)
+ggsave(plot.nice, filename=file.path(PROJHOME, "figures/starting_business_its.png"),
+       width=9, height=5.5, units="in", type="cairo", dpi=300)
+
 
 #' ### Countries in 2001 report
 plot.edb.2001 <- edb.its.2001 %>%
@@ -71,24 +130,62 @@ plot.edb.2001 <- edb.its.2001 %>%
   gather(variable, value, -year) %>%
   group_by(year, variable) %>%
   summarise(avg = mean(value, na.rm=TRUE)) %>%
-  filter(!is.nan(avg))
+  filter(!is.nan(avg)) %>%
+  filter(year >= 2003) %>%
+  mutate(variable = fct_recode(variable,
+                               `Contract—Days` = "con_days",
+                               `Contract—Procedures` = "con_proced",
+                               `Starting a business—Capital` = "sb_capital",
+                               `Starting a business—Cost` = "sb_cost",
+                               `Starting a business—Days` = "sb_days",
+                               `Starting a business—Procedures` = "sb_proced"))
 
 plot.interventions <- data_frame(year = 2005:2006,
                                  intervention = c("2005", "2006"))
 
-#+ fig.width=9, fig.height=5.5
-ggplot(plot.edb.2001, aes(x=year, y=avg)) +
-  geom_vline(data=plot.interventions, aes(xintercept=year,
-                                          colour=intervention),
-             linetype="dashed", size=0.5) +
-  geom_line() + 
-  scale_color_manual(values=c("red", "blue"), name=NULL) +
-  scale_x_continuous(limits=c(2000, 2015), breaks=seq(2000, 2015, 5)) +
-  coord_cartesian(xlim=c(2000, 2015)) +
-  labs(x=NULL, y=NULL, title="Average values of sb variables over time",
-       subtitle="Only countries included in 2001 report") +
-  facet_wrap(~ variable, scales="free_y") + 
-  theme_edb()
+# Ugh this is so dumb just copying-pasting the same function, but I don't want
+# to deal with passing the plot.edb.2001 dataframe with pmap
+make.facet.2001 <- function(x, ymin, ymax, ylab) {
+  plot.data <- plot.edb.2001 %>%
+    filter(variable == x)
+  
+  facet <- ggplot(plot.data, aes(x=year, y=avg)) +
+    geom_vline(data=plot.interventions, aes(xintercept=year,
+                                            colour=intervention),
+               linetype="dashed", size=0.5) +
+    geom_line() + 
+    scale_color_manual(values=c("red", "blue"), name=NULL) +
+    scale_x_continuous(limits=c(2000, 2015), breaks=seq(2000, 2015, 5)) +
+    coord_cartesian(xlim=c(2000, 2015), ylim=c(ymin, ymax)) +
+    guides(color=FALSE) +
+    labs(x=NULL, y=ylab, title=x) +
+    theme_edb() + theme(plot.title = element_text(size=rel(1), hjust=0.5))
+  
+  return(facet)
+}
+
+plots.2001 <- tribble(
+  ~ymin, ~ymax, ~ylab,        ~variable,
+  0,     610,   "Days",       "Contract—Days",
+  0,     45,    "Procedures", "Contract—Procedures",
+  0,     200,   "Capital",    "Starting a business—Capital",
+  0,     100,   "Cost",       "Starting a business—Cost",
+  0,     50,    "Days",       "Starting a business—Days",
+  0,     10,    "Procedures", "Starting a business—Procedures"
+) %>%
+  mutate(facet = pmap(.l=list(variable, ymin, ymax, ylab), make.facet.2001))
+
+plot.edb.better.2001 <- arrangeGrob(grobs=plots.2001$facet, nrow=2)
+grid::grid.newpage()
+grid::grid.draw(plot.edb.better.2001)
+
+ggsave(plot.edb.better.2001, 
+       filename=file.path(PROJHOME, "figures/starting_business_2001_its_no_title.pdf"),
+       width=9, height=4.5, units="in", device=cairo_pdf)
+ggsave(plot.edb.better.2001, 
+       filename=file.path(PROJHOME, "figures/starting_business_2001_its_no_title.png"),
+       width=9, height=4.5, units="in", type="cairo", dpi=300)
+
 
 #' ### Countries with reform committees in 2015
 plot.edb.committee <- edb.its.2001.committee %>%
