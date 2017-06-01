@@ -11,4 +11,5 @@ analysis/final_models.html
 analysis/final_models_files/
 analysis/labor_data.html
 analysis/labor_data_files/
-
+analysis/bureau_reforms.html
+analysis/bureau_reforms_files/
