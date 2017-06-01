@@ -1,3 +1,24 @@
+#' ---
+#' title: "EDB miscellaneous reform committee analysis"
+#' author: "Andrew Heiss"
+#' date: "`r format(Sys.time(), '%B %e, %Y')`"
+#' output: 
+#'   html_document: 
+#'     css: ../html/fixes.css
+#'     code_folding: hide
+#'     toc: yes
+#'     toc_float: true
+#'     toc_depth: 4
+#'     highlight: pygments
+#'     self_contained: no
+#'     theme: flatly
+#'     fig_height: 4
+#'     fig_width: 6
+#'     includes:
+#'       after_body: ../html/add_home_link.html
+#' ---
+
+#+ message=FALSE
 library(dplyr)
 library(tidyr)
 library(forcats)
@@ -99,7 +120,7 @@ edb.reforms.year.bureau <- edb.reforms %>%
 
 
 # -----------------------------------------
-# Plot average, total, and total positive
+#' # Plot average, total, and total positive
 # -----------------------------------------
 plot.reforms.avg <- ggplot(edb.reforms.year.bureau, 
        aes(x=year.date, y=avg.reforms, colour=has.bureau)) + 
@@ -165,7 +186,7 @@ ggsave(plot.reforms.positive, filename=file.path(PROJHOME, "figures/bureau_refor
        width=5, height=3.5, units="in", type="cairo", dpi=300)
 
 
-# Rankings in 2005 and 2014
+#' # Rankings in 2005 and 2014
 edb.rankings <- edb.raw %>%
   select(ccode, year, p_edb_rank, has.bureau) %>%
   filter(year %in% c(2005, 2014)) %>%
@@ -180,21 +201,27 @@ edb.rankings <- edb.raw %>%
          label = ifelse(add.label, countryname, NA)) %>%
   mutate(change.in.ranking = `2014` - `2005`)
 
-# model.rankings <- lm(`2014` ~ `2005` + has.bureau,
-#                      data=edb.rankings)
-# 
-# model.rankings.int <- lm(`2014` ~ `2005` + has.bureau + `2005` * has.bureau,
-#                          data=edb.rankings)
-# 
-# model.rankings.change <- lm(change.in.ranking ~ has.bureau,
-#                             data=edb.rankings)
-# 
-# var.labs <- c("2005 ranking", "Has reform committee",
-#               "2005 ranking × has reform committee")
-# 
-# stargazer(model.rankings, model.rankings.int, model.rankings.change, 
-#           covariate.labels=var.labs,
-#           type="html", out="~/Desktop/committees.html")
+model.rankings <- lm(`2014` ~ `2005` + has.bureau,
+                     data=edb.rankings)
+
+model.rankings.int <- lm(`2014` ~ `2005` + has.bureau + `2005` * has.bureau,
+                         data=edb.rankings)
+
+model.rankings.change <- lm(change.in.ranking ~ has.bureau,
+                            data=edb.rankings)
+
+var.labs <- c("2005 ranking", "Has reform committee",
+              "2005 ranking × has reform committee")
+
+#' - Model 1: Ranking in 2014 = Ranking in 2005 + Has committee
+#' - Model 2: Ranking in 2014 = Ranking in 2005 + Has committee + (Ranking in 2005 × Has committee)
+#' - Model 3: (Ranking in 2014 - Ranking in 2005) = Has committee
+#' 
+
+#+ results="asis"
+stargazer(model.rankings, model.rankings.int, model.rankings.change,
+          covariate.labels=var.labs,
+          type="html")
 
 annotations <- data_frame(x = c(max(edb.rankings$`2005`, na.rm=TRUE), 0),
                           y = c(0, max(edb.rankings$`2014`, na.rm=TRUE)),
@@ -459,7 +486,8 @@ model.rankings.type <- lm(change1 ~ has.bureau +
                             cred_reform + pmi_reform + tx_reform + 
                             trade_reform + con_reform + insolv_reform, 
                           data=reform.rankings.type.wide)
-summary(model.rankings.type)
+#+ results="asis"
+stargazer(model.rankings.type, type="html")
 
 rankings.type.tidy <- tidy(model.rankings.type, conf.int=TRUE) %>%
   filter(term != "(Intercept)") %>%
@@ -492,7 +520,7 @@ reform.mix <- reform.rankings.type %>%
 
 plot.mix.reforms <- ggplot(reform.mix, 
                            aes(x=reforms.prop, y=reform.type.clean, fill=has.bureau)) + 
-  geom_barh(stat="identity", position="dodge") +
+  geom_barh(stat="identity", position=position_dodgev()) +
   scale_fill_manual(values=c("#004259", "#FC7300"), name=NULL) + 
   scale_x_continuous(labels=percent, expand=c(0.025, 0)) +
   labs(x="Proportion", y=NULL, title="Mix of EDB reforms",
@@ -507,7 +535,7 @@ ggsave(plot.mix.reforms, filename=file.path(PROJHOME, "figures/bureau_reforms.mi
 
 
 # ----------------------------------------
-# Predict presence of a reform committee
+#' # Predict presence of a reform committee
 # ----------------------------------------
 # What explains which countries create EDB reform committees?
 model.committee = glm(has.bureau ~ p_edb_rank + icrg_index + 
@@ -515,7 +543,9 @@ model.committee = glm(has.bureau ~ p_edb_rank + icrg_index +
                         polity2 + yrsoffc,
                       data=filter(edb.raw, year == 2008),
                       family=binomial(link="logit"))
-summary(model.committee)
+
+#+ results="asis"
+stargazer(model.committee, type="html")
 
 committee.tidy <- tidy(model.committee, conf.int=TRUE, exponentiate=TRUE) %>%
   filter(term != "(Intercept)") %>%
